@@ -1,0 +1,29 @@
+name,domain,category,score_global,score_autorite,score_qualite,score_technique,trafic_estime
+CBAO,cbao.sn,banque_finance,29.5,0.0,50.0,60.0,9613
+Ecobank,ecobank.com,banque_finance,41.8,46.0,59.6,1.2,16214
+Orange Money,orangemoney.sn,banque_finance,17.7,0.0,50.0,1.2,4467
+Wave,wave.com,banque_finance,44.8,60.1,50.0,1.2,17991
+Afrikrea,afrikrea.com,ecommerce,42.0,38.0,70.4,1.2,21775
+CoinAfrique,sn.coinafrique.com,ecommerce,42.7,30.0,50.0,58.3,22321
+Dakar Deal,dakardeal.com,ecommerce,17.7,0.0,50.0,1.2,5957
+Expat Dakar,expat-dakar.com,ecommerce,58.0,38.0,85.0,55.9,35337
+Jumia Sénégal,jumia.sn,ecommerce,48.7,38.0,50.0,70.5,27188
+Emploi.sn,emploi.sn,emploi,17.7,0.0,50.0,1.2,2978
+Rekrute,rekrute.com,emploi,55.6,38.0,67.6,74.2,16583
+Senjob,senjob.com,emploi,52.3,30.0,79.1,55.7,15129
+Actusen,actusen.sn,presse,45.0,30.0,78.0,20.8,75467
+Dakaractu,dakaractu.com,presse,58.3,38.0,74.8,75.2,111286
+Dakarmatin,dakarmatin.com,presse,59.4,38.0,88.4,56.8,114451
+L'Observateur,lobservateur.sn,presse,21.6,8.6,50.0,1.2,25096
+Leral,leral.net,presse,52.8,38.0,71.1,53.9,95915
+Pressafrik,pressafrik.com,presse,52.1,38.0,75.2,43.2,94014
+Rewmi,rewmi.com,presse,40.6,38.0,50.0,30.0,64673
+Senego,senego.com,presse,54.4,30.0,84.8,56.3,100308
+Senenews,senenews.com,presse,76.8,68.0,98.6,58.5,168260
+Seneweb,seneweb.com,presse,46.2,38.0,50.0,57.9,78506
+Sud Quotidien,sudquotidien.sn,presse,47.1,38.0,50.0,62.6,80811
+Xibaaru,xibaaru.com,presse,33.3,0.0,80.8,25.0,48040
+Expresso,expressotelecom.sn,telephonie,17.9,0.3,50.0,1.2,9087
+Free Sénégal,free.sn,telephonie,28.9,24.7,50.0,1.2,18643
+Orange Sénégal,orange.sn,telephonie,49.2,38.0,50.0,73.2,41412
+Sonatel,sonatel.com,telephonie,26.8,0.0,50.0,46.5,16648
