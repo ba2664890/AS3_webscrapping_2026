@@ -36,201 +36,283 @@ st.set_page_config(
 )
 
 # ══════════════════════════════════════════════════════════════════════════════
-# DESIGN SYSTEM — MASTERCLASS
+# DESIGN SYSTEM — ULTRA PREMIUM SaaS
 # ══════════════════════════════════════════════════════════════════════════════
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* ═══════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════ */
 :root {
-  --navy:         #0d1117;
-  --navy-2:       #161b22;
-  --navy-3:       #21262d;
-  --emerald:      #10B981;
-  --emerald-dim:  rgba(16,185,129,0.10);
-  --blue:         #0EA5E9;
-  --surface:      #f5f6f8;
-  --card:         #ffffff;
-  --alt:          #f3f4f6;
-  --border:       rgba(0,0,0,0.055);
-  --txt:          #111827;
-  --txt-2:        #4B5563;
-  --txt-3:        #9CA3AF;
-  --shadow-md:    0 2px 8px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-lg:    0 8px 24px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.04);
+  --blue:          #0EA5E9;
+  --blue-dark:     #0284C7;
+  --blue-dim:      rgba(14,165,233,0.10);
+  --purple:        #6366F1;
+  --purple-dim:    rgba(99,102,241,0.08);
+  --emerald:       #10B981;
+  --emerald-dim:   rgba(16,185,129,0.10);
+  --amber:         #F59E0B;
+  --red:           #EF4444;
+  --surface:       #EEF2FF;
+  --surface-2:     #F5F3FF;
+  --card:          #ffffff;
+  --alt:           #F1F5F9;
+  --border:        rgba(99,102,241,0.10);
+  --border-blue:   rgba(14,165,233,0.12);
+  --txt:           #0F172A;
+  --txt-2:         #475569;
+  --txt-3:         #94A3B8;
+  --shadow-sm:     0 1px 3px rgba(99,102,241,0.06), 0 1px 2px rgba(0,0,0,0.03);
+  --shadow-md:     0 4px 20px rgba(99,102,241,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-lg:     0 8px 40px rgba(99,102,241,0.12), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-glow-b: 0 0 28px rgba(14,165,233,0.18);
+  --shadow-glow-p: 0 0 28px rgba(99,102,241,0.18);
+  --grad-bp:       linear-gradient(135deg,#0EA5E9 0%,#6366F1 100%);
+  --grad-surface:  linear-gradient(145deg,#EEF2FF 0%,#F5F0FF 50%,#EDFFF6 100%);
 }
 
-/* ── RESET ── */
+/* ═══════════════════════════════════════
+   GLOBAL RESET + BACKGROUND
+═══════════════════════════════════════ */
 #MainMenu,footer,header,
 [data-testid="stToolbar"],
 [data-testid="stDecoration"],
 [data-testid="stStatusWidget"] { display:none !important; }
 
-html,body,[data-testid="stAppViewContainer"] {
-  background:var(--surface) !important;
+html,body {
+  background: var(--grad-surface) !important;
+  background-attachment: fixed !important;
+}
+[data-testid="stAppViewContainer"] {
+  background: var(--grad-surface) !important;
   font-family:'Inter',sans-serif !important;
   color:var(--txt) !important;
 }
 .block-container { padding:0 !important; max-width:100% !important; }
 
-/* ── SIDEBAR LIGHT GLASS ── */
+/* ═══════════════════════════════════════
+   SIDEBAR — FLOATING GLASS PANEL
+═══════════════════════════════════════ */
 [data-testid="stSidebar"] {
-  background: rgba(255,255,255,0.92) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border-right: 1px solid rgba(14,165,233,0.10) !important;
-  box-shadow: 4px 0 32px rgba(14,165,233,0.07), 1px 0 0 rgba(0,0,0,0.04) !important;
+  background: rgba(255,255,255,0.97) !important;
+  backdrop-filter: blur(40px) !important;
+  -webkit-backdrop-filter: blur(40px) !important;
+  border-right: 1px solid rgba(99,102,241,0.08) !important;
+  box-shadow:
+    12px 0 60px rgba(99,102,241,0.08),
+    6px 0 24px rgba(14,165,233,0.06),
+    1px 0 0 rgba(255,255,255,0.9) inset !important;
 }
 [data-testid="stSidebarContent"] { padding:0 !important; }
 
-/* ── NAV ACTIVE DIV ── */
-.nav-active {
-  display:flex; align-items:center; gap:10px;
-  padding:10px 14px; border-radius:10px; margin:0 0 3px;
-  background: linear-gradient(135deg, rgba(14,165,233,0.10) 0%, rgba(99,102,241,0.06) 100%);
-  color:#0369a1; font-weight:600; font-size:.8125rem;
-  font-family:'Inter',sans-serif; letter-spacing:.01em;
-  box-shadow: inset 3px 0 0 #0EA5E9, 0 2px 8px rgba(14,165,233,0.12);
-  position:relative;
+/* Status badge */
+.sb-status {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:5px 12px 5px 10px;
+  background:rgba(16,185,129,0.07);
+  border:1px solid rgba(16,185,129,0.22);
+  border-radius:20px;
+  font-family:'Inter',sans-serif; font-size:.5625rem;
+  font-weight:700; color:#059669; letter-spacing:.07em; text-transform:uppercase;
 }
-.nav-active::after {
-  content:''; position:absolute; right:12px; top:50%; transform:translateY(-50%);
-  width:6px; height:6px; border-radius:50%;
-  background:#0EA5E9;
-  box-shadow:0 0 6px 2px rgba(14,165,233,0.5);
+.sb-dot {
+  width:7px; height:7px; border-radius:50%; flex-shrink:0;
+  background:#10B981;
+  box-shadow:0 0 0 2px rgba(16,185,129,0.22), 0 0 10px rgba(16,185,129,0.55);
+  animation:pulse-green 2.2s ease infinite;
+}
+@keyframes pulse-green {
+  0%,100% { box-shadow:0 0 0 2px rgba(16,185,129,0.22), 0 0 10px rgba(16,185,129,0.45); }
+  50%      { box-shadow:0 0 0 5px rgba(16,185,129,0.10), 0 0 18px rgba(16,185,129,0.65); }
 }
 
-/* ── NAV BUTTONS (inactive) ── */
+/* Nav section label */
+.sb-section {
+  font-family:'Inter',sans-serif; font-size:.5rem; font-weight:700;
+  color:rgba(15,23,42,0.25); letter-spacing:.22em; text-transform:uppercase;
+  padding:.2rem 1.5rem .4rem;
+}
+
+/* Nav active item */
+.nav-active {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px; border-radius:11px; margin:0 0 2px;
+  background:linear-gradient(135deg,rgba(14,165,233,0.13),rgba(99,102,241,0.08));
+  color:#0369a1; font-weight:600; font-size:.8125rem;
+  font-family:'Inter',sans-serif; letter-spacing:.005em;
+  box-shadow:
+    inset 3px 0 0 #0EA5E9,
+    0 2px 14px rgba(14,165,233,0.14),
+    0 1px 0 rgba(255,255,255,0.85) inset;
+  position:relative;
+}
+.nav-active .ni {
+  font-size:.75rem; opacity:.8; width:16px; text-align:center;
+}
+.nav-active::after {
+  content:''; position:absolute; right:13px; top:50%; transform:translateY(-50%);
+  width:6px; height:6px; border-radius:50%; background:#0EA5E9;
+  box-shadow:0 0 8px 3px rgba(14,165,233,0.55);
+}
+
+/* Nav buttons (inactive) */
 [data-testid="stSidebar"] .stButton > button {
   background:transparent !important;
-  color:rgba(55,65,81,0.55) !important;
-  border:none !important; border-radius:10px !important;
+  color:rgba(71,85,105,0.65) !important;
+  border:none !important; border-radius:11px !important;
   text-align:left !important; justify-content:flex-start !important;
-  padding:10px 14px !important; margin:0 0 3px !important;
+  padding:10px 14px !important; margin:0 0 2px !important;
   font-size:.8125rem !important; font-weight:400 !important;
-  font-family:'Inter',sans-serif !important; letter-spacing:.01em !important;
-  width:100% !important; transition:all .18s cubic-bezier(.4,0,.2,1) !important;
+  font-family:'Inter',sans-serif !important; letter-spacing:.005em !important;
+  width:100% !important; transition:all .17s cubic-bezier(.4,0,.2,1) !important;
   box-shadow:none !important; min-height:0 !important;
 }
 [data-testid="stSidebar"] .stButton > button:hover {
-  background:rgba(14,165,233,0.06) !important;
+  background:rgba(14,165,233,0.07) !important;
   color:#0369a1 !important;
+  box-shadow:inset 3px 0 0 rgba(14,165,233,0.35) !important;
+  transform:translateX(2px) !important;
 }
 [data-testid="stSidebar"] .stButton > button:focus { box-shadow:none !important; }
 
-/* ── SIDEBAR SELECTBOX ── */
-[data-testid="stSidebar"] [data-testid="stSelectbox"] > div > div,
+/* CTA button wrap — Veille & Tendances */
+.nav-cta-wrap .stButton > button {
+  background: linear-gradient(135deg,#0EA5E9,#6366F1) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  font-size: .8125rem !important;
+  padding: 12px 16px !important;
+  width: 100% !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
+  box-shadow:
+    0 4px 18px rgba(14,165,233,0.32),
+    0 1px 0 rgba(255,255,255,0.22) inset,
+    0 8px 32px rgba(99,102,241,0.18) !important;
+  transition: all .2s ease !important;
+  position: relative !important;
+  letter-spacing: .005em !important;
+}
+.nav-cta-wrap .stButton > button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow:
+    0 8px 28px rgba(14,165,233,0.40),
+    0 1px 0 rgba(255,255,255,0.28) inset,
+    0 12px 40px rgba(99,102,241,0.24) !important;
+}
+
+/* Export button wrap */
+.nav-export-wrap .stButton > button {
+  background: rgba(99,102,241,0.07) !important;
+  color: #4338CA !important;
+  border: 1px solid rgba(99,102,241,0.15) !important;
+  border-radius: 11px !important;
+  font-weight: 500 !important;
+  font-size: .8125rem !important;
+  padding: 10px 14px !important;
+  width: 100% !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
+  box-shadow: none !important;
+  transition: all .17s ease !important;
+  letter-spacing: .005em !important;
+}
+.nav-export-wrap .stButton > button:hover {
+  background: rgba(99,102,241,0.12) !important;
+  border-color: rgba(99,102,241,0.25) !important;
+  transform: translateX(2px) !important;
+}
+
+/* Sidebar divider */
+.sb-div {
+  height:1px; margin:.75rem 1.5rem;
+  background:linear-gradient(90deg,transparent,rgba(99,102,241,0.15),transparent);
+}
+
+/* Sidebar selectbox */
 [data-testid="stSidebar"] [data-baseweb="select"] > div {
-  background:rgba(241,245,249,0.8) !important;
-  border:1px solid rgba(14,165,233,0.15) !important; border-radius:8px !important;
-  color:#374151 !important; font-size:.8125rem !important;
+  background:rgba(238,242,255,0.8) !important;
+  border:1px solid rgba(99,102,241,0.15) !important;
+  border-radius:10px !important;
+  color:var(--txt) !important; font-size:.8125rem !important;
 }
 
-/* ── MAIN INPUTS ── */
-[data-testid="stMultiSelect"] > div {
-  background:var(--card) !important;
-  border:1px solid var(--border) !important; border-radius:8px !important;
-}
-[data-testid="stMultiSelect"] span {
-  background:#dbeafe !important; color:#1e40af !important;
-  border:none !important; border-radius:6px !important;
-  font-size:.6875rem !important; font-weight:500 !important;
-}
-[data-testid="stSlider"] [data-baseweb="slider"] [role="slider"] {
-  background:var(--emerald) !important;
-}
-
-/* ── DATAFRAME ── */
-[data-testid="stDataFrame"] { border-radius:12px !important; overflow:hidden !important; }
-[data-testid="stDataFrame"] th {
-  background:var(--alt) !important; color:var(--txt-2) !important;
-  font-size:.6875rem !important; letter-spacing:.08em !important;
-  text-transform:uppercase !important; font-weight:600 !important;
-}
-[data-testid="stDataFrame"] td {
-  color:var(--txt) !important; font-size:.875rem !important; background:var(--card) !important;
-}
-
-/* ── BUTTONS ── */
-.stButton > button {
-  background:var(--navy) !important; color:#fff !important;
-  border:none !important; border-radius:8px !important;
-  font-weight:500 !important; font-size:.875rem !important;
-  padding:10px 20px !important; transition:opacity .18s !important;
-}
-.stButton > button:hover { opacity:.82 !important; }
-[data-testid="stDownloadButton"] > button {
-  background:var(--emerald) !important; color:#fff !important;
-  border:none !important; border-radius:8px !important; font-weight:500 !important;
-}
-
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar { width:3px; height:3px; }
-::-webkit-scrollbar-track { background:rgba(241,245,249,0.6); }
-::-webkit-scrollbar-thumb { background:rgba(14,165,233,0.28); border-radius:3px; }
-
-/* ── LAYOUT ── */
+/* ═══════════════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════════════ */
 .mwrap { padding:2.5rem 3rem 6rem; }
 
 /* ── ANIMATIONS ── */
 @keyframes fade-up {
-  from { opacity:0; transform:translateY(14px); }
+  from { opacity:0; transform:translateY(16px); }
   to   { opacity:1; transform:translateY(0); }
 }
-.anim-0 { animation:fade-up .45s ease both; }
-.anim-1 { animation:fade-up .45s .07s ease both; }
-.anim-2 { animation:fade-up .45s .14s ease both; }
-.anim-3 { animation:fade-up .45s .21s ease both; }
-.anim-4 { animation:fade-up .45s .28s ease both; }
+.anim-0 { animation:fade-up .5s cubic-bezier(.22,1,.36,1) both; }
+.anim-1 { animation:fade-up .5s .07s cubic-bezier(.22,1,.36,1) both; }
+.anim-2 { animation:fade-up .5s .14s cubic-bezier(.22,1,.36,1) both; }
+.anim-3 { animation:fade-up .5s .21s cubic-bezier(.22,1,.36,1) both; }
+.anim-4 { animation:fade-up .5s .28s cubic-bezier(.22,1,.36,1) both; }
+@keyframes pulse-dot {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:.3; transform:scale(.6); }
+}
 
 /* ── PAGE HEADER ── */
-.ph-wrap { margin-bottom:2.5rem; animation:fade-up .5s ease both; }
+.ph-wrap { margin-bottom:2.5rem; animation:fade-up .55s cubic-bezier(.22,1,.36,1) both; }
 .ph-eyebrow {
   font-family:'Inter',sans-serif; font-size:.625rem; font-weight:700;
-  color:var(--emerald); letter-spacing:.16em; text-transform:uppercase;
+  color:var(--blue); letter-spacing:.18em; text-transform:uppercase;
   margin-bottom:10px; display:flex; align-items:center; gap:8px;
 }
 .ph-dot {
-  width:6px; height:6px; border-radius:50%;
-  background:var(--emerald); display:inline-block;
-  animation:pulse-dot 2.4s ease infinite;
-}
-@keyframes pulse-dot {
-  0%,100% { opacity:1; transform:scale(1); }
-  50%      { opacity:.35; transform:scale(.7); }
+  width:6px; height:6px; border-radius:50%; background:var(--blue);
+  display:inline-block; animation:pulse-dot 2.4s ease infinite;
+  box-shadow:0 0 6px 2px rgba(14,165,233,0.4);
 }
 .ph-title {
-  font-family:'Manrope',sans-serif; font-size:2.25rem; font-weight:800;
-  color:var(--txt); line-height:1.1; letter-spacing:-.03em; margin:0 0 10px;
+  font-family:'Manrope',sans-serif; font-size:2.25rem; font-weight:900;
+  color:var(--txt); line-height:1.1; letter-spacing:-.035em; margin:0 0 10px;
 }
-.ph-title .acc { color:var(--emerald); }
+.ph-title .acc {
+  background:var(--grad-bp);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
 .ph-sub {
   font-family:'Inter',sans-serif; font-size:.9375rem;
   color:var(--txt-2); margin:0; line-height:1.65; font-weight:400;
 }
 
-/* ── KPI MASTERCLASS ── */
+/* ── KPI CARDS — PREMIUM GLASS ── */
 .kpi-wrap {
-  background:var(--card); border-radius:16px;
-  padding:24px 24px 20px; box-shadow:var(--shadow-lg);
+  background: rgba(255,255,255,0.95);
+  border-radius:18px;
+  padding:24px 24px 20px;
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.9);
+  border: 1px solid rgba(99,102,241,0.07);
   position:relative; overflow:hidden;
+  backdrop-filter:blur(16px);
 }
 .kpi-wrap::before {
-  content:''; position:absolute; top:0; left:0; right:0; height:3px;
-  background:var(--kpi-c,var(--emerald)); border-radius:16px 16px 0 0;
+  content:''; position:absolute; top:0; left:0; right:0; height:2.5px;
+  background:var(--kpi-c,var(--grad-bp)); border-radius:18px 18px 0 0;
 }
 .kpi-wrap::after {
-  content:''; position:absolute; top:-20px; right:-20px;
-  width:100px; height:100px; border-radius:50%;
-  background:var(--kpi-c,var(--emerald)); opacity:.04;
+  content:''; position:absolute; top:-30px; right:-30px;
+  width:120px; height:120px; border-radius:50%;
+  background:var(--kpi-c,#6366F1); opacity:.035;
 }
 .kpi-label {
-  font-family:'Inter',sans-serif; font-size:.625rem; font-weight:700;
-  color:var(--txt-3); letter-spacing:.14em; text-transform:uppercase; margin-bottom:12px;
+  font-family:'Inter',sans-serif; font-size:.5625rem; font-weight:700;
+  color:var(--txt-3); letter-spacing:.16em; text-transform:uppercase; margin-bottom:12px;
 }
 .kpi-value {
-  font-family:'Manrope',sans-serif; font-size:2.6rem; font-weight:800;
-  color:var(--txt); line-height:1; letter-spacing:-.04em; margin-bottom:4px;
+  font-family:'Manrope',sans-serif; font-size:2.6rem; font-weight:900;
+  color:var(--txt); line-height:1; letter-spacing:-.05em; margin-bottom:4px;
 }
 .kpi-sub {
   font-family:'Inter',sans-serif; font-size:.75rem;
@@ -239,134 +321,201 @@ html,body,[data-testid="stAppViewContainer"] {
 .kpi-badge {
   display:inline-flex; align-items:center; gap:4px;
   padding:3px 9px; border-radius:6px;
-  font-family:'Inter',sans-serif; font-size:.625rem; font-weight:700;
-  letter-spacing:.06em; text-transform:uppercase;
+  font-family:'Inter',sans-serif; font-size:.5625rem; font-weight:700;
+  letter-spacing:.07em; text-transform:uppercase;
 }
 .badge-up   { background:#dcfce7; color:#15803d; }
 .badge-down { background:#fee2e2; color:#b91c1c; }
-.badge-flat { background:var(--alt); color:var(--txt-3); }
-.kpi-track { height:2px; background:var(--alt); border-radius:2px; overflow:hidden; margin-top:14px; }
-.kpi-fill  { height:100%; border-radius:2px; background:var(--kpi-c,var(--emerald)); }
+.badge-flat { background:rgba(99,102,241,0.07); color:var(--txt-3); }
+.kpi-track { height:2px; background:rgba(99,102,241,0.07); border-radius:2px; overflow:hidden; margin-top:14px; }
+.kpi-fill  { height:100%; border-radius:2px; background:var(--kpi-c,var(--blue)); }
 
 /* ── SECTION LABEL ── */
 .sec {
-  font-family:'Inter',sans-serif; font-size:.625rem; font-weight:700;
-  color:var(--txt-3); letter-spacing:.14em; text-transform:uppercase;
-  margin:2.5rem 0 1.25rem; display:flex; align-items:center; gap:12px;
+  font-family:'Inter',sans-serif; font-size:.5625rem; font-weight:700;
+  color:var(--txt-3); letter-spacing:.16em; text-transform:uppercase;
+  margin:2.5rem 0 1.25rem; display:flex; align-items:center; gap:14px;
 }
-.sec::after { content:''; flex:1; height:1px; background:var(--border); }
+.sec::after {
+  content:''; flex:1; height:1px;
+  background:linear-gradient(90deg,rgba(99,102,241,0.15),transparent);
+}
 
-/* ── CARD ── */
-.crd { background:var(--card); border-radius:16px; overflow:hidden; box-shadow:var(--shadow-md); }
+/* ── CARDS ── */
+.crd {
+  background:rgba(255,255,255,0.95); border-radius:18px; overflow:hidden;
+  box-shadow:var(--shadow-md);
+  border:1px solid rgba(99,102,241,0.06);
+}
 .crd-hd {
-  padding:14px 20px; background:var(--alt);
-  font-family:'Inter',sans-serif; font-size:.625rem; font-weight:700;
-  color:var(--txt-3); letter-spacing:.1em; text-transform:uppercase;
-  display:flex; justify-content:space-between; border-bottom:1px solid var(--border);
+  padding:14px 20px;
+  background:linear-gradient(135deg,rgba(238,242,255,0.9),rgba(245,240,255,0.6));
+  font-family:'Inter',sans-serif; font-size:.5625rem; font-weight:700;
+  color:var(--txt-3); letter-spacing:.12em; text-transform:uppercase;
+  display:flex; justify-content:space-between;
+  border-bottom:1px solid rgba(99,102,241,0.08);
 }
 
 /* ── RANK ROW ── */
-.rrow { display:grid; grid-template-columns:2rem 1fr auto auto; align-items:center; padding:11px 20px; gap:12px; transition:background .12s; }
-.rrow:hover { background:var(--alt); }
+.rrow {
+  display:grid; grid-template-columns:2rem 1fr auto auto;
+  align-items:center; padding:11px 20px; gap:12px; transition:all .13s;
+}
+.rrow:hover {
+  background:rgba(14,165,233,0.04);
+  box-shadow:inset 3px 0 0 rgba(14,165,233,0.25);
+}
 .rn   { font-family:'Manrope',sans-serif; font-size:.75rem; color:var(--txt-3); text-align:right; font-weight:700; }
 .rname{ font-size:.875rem; font-weight:600; color:var(--txt); font-family:'Inter',sans-serif; }
 .rcat { font-size:.6875rem; color:var(--txt-3); margin-top:2px; font-family:'Inter',sans-serif; }
-.rbar-w { height:2px; border-radius:2px; background:var(--alt); margin-top:6px; overflow:hidden; }
+.rbar-w { height:2px; border-radius:2px; background:rgba(99,102,241,0.08); margin-top:6px; overflow:hidden; }
 .rbar   { height:100%; border-radius:2px; }
 .rscr { font-family:'Manrope',sans-serif; font-size:.9375rem; font-weight:800; text-align:right; }
 .rtrf { font-family:'Inter',sans-serif; font-size:.75rem; color:var(--emerald); text-align:right; white-space:nowrap; font-weight:500; }
 
 /* ── INFO BOX ── */
-.ibox { background:#eff6ff; color:#1e40af; border-radius:12px; padding:16px 20px; font-size:.875rem; margin:1rem 0; border:1px solid #bfdbfe; }
+.ibox {
+  background:linear-gradient(135deg,rgba(238,242,255,0.9),rgba(219,234,254,0.7));
+  color:#3730a3; border-radius:14px; padding:16px 20px; font-size:.875rem;
+  margin:1rem 0; border:1px solid rgba(99,102,241,0.15);
+}
 
-/* ── PILLS ── */
+/* ── STATUS PILLS ── */
 .pills { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:2rem; }
-.pill  { display:inline-flex; align-items:center; gap:.4rem; padding:.3rem .8rem; border-radius:6px; font-size:.6875rem; font-weight:500; font-family:'Inter',sans-serif; }
-.pill-ok   { background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; }
-.pill-warn { background:#fffbeb; color:#b45309; border:1px solid #fde68a; }
-.pill-gray { background:var(--alt); color:var(--txt-3); border:1px solid var(--border); }
+.pill  {
+  display:inline-flex; align-items:center; gap:.4rem;
+  padding:.3rem .85rem; border-radius:20px;
+  font-size:.625rem; font-weight:600; font-family:'Inter',sans-serif;
+}
+.pill-ok   { background:rgba(16,185,129,0.09); color:#047857; border:1px solid rgba(16,185,129,0.22); }
+.pill-warn { background:rgba(245,158,11,0.09); color:#b45309; border:1px solid rgba(245,158,11,0.22); }
+.pill-gray { background:rgba(99,102,241,0.07); color:var(--txt-3); border:1px solid var(--border); }
 
 /* ── DARK CARD ── */
-.dark-crd { background:linear-gradient(135deg,#0d1117,#1a2332); border-radius:16px; padding:24px; color:#fff; }
+.dark-crd {
+  background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 60%,#0f172a 100%);
+  border-radius:18px; padding:24px; color:#fff;
+  box-shadow:0 8px 40px rgba(99,102,241,0.25);
+  border:1px solid rgba(99,102,241,0.2);
+}
 
 /* ── CHART CARD ── */
-.chart-card { background:var(--card); border-radius:16px; padding:8px 8px 4px; box-shadow:var(--shadow-md); overflow:hidden; margin-bottom:1.5rem; }
+.chart-card {
+  background:rgba(255,255,255,0.95); border-radius:18px;
+  padding:8px 8px 4px; box-shadow:var(--shadow-md);
+  border:1px solid rgba(99,102,241,0.06);
+  overflow:hidden; margin-bottom:1.5rem;
+}
 
-/* ── GAUGE ROW ── */
+/* ── GAUGE ── */
 .gauge-lbl {
   font-family:'Manrope',sans-serif; font-size:1.5rem; font-weight:800;
   color:var(--txt); text-align:center; line-height:1; margin-bottom:2px;
 }
 .gauge-sub { font-family:'Inter',sans-serif; font-size:.6875rem; color:var(--txt-3); text-align:center; }
 
+/* ── INPUTS ── */
+[data-testid="stMultiSelect"] > div {
+  background:var(--card) !important;
+  border:1px solid rgba(99,102,241,0.15) !important; border-radius:10px !important;
+}
+[data-testid="stMultiSelect"] span {
+  background:rgba(99,102,241,0.10) !important; color:#4338CA !important;
+  border:none !important; border-radius:6px !important;
+  font-size:.6875rem !important; font-weight:500 !important;
+}
+[data-testid="stSlider"] [data-baseweb="slider"] [role="slider"] {
+  background:var(--blue) !important;
+}
+[data-testid="stDataFrame"] { border-radius:14px !important; overflow:hidden !important; }
+[data-testid="stDataFrame"] th {
+  background:rgba(238,242,255,0.9) !important; color:var(--txt-2) !important;
+  font-size:.6875rem !important; letter-spacing:.08em !important;
+  text-transform:uppercase !important; font-weight:600 !important;
+}
+[data-testid="stDataFrame"] td {
+  color:var(--txt) !important; font-size:.875rem !important;
+  background:var(--card) !important;
+}
+
+/* ── GLOBAL BUTTONS ── */
+.stButton > button {
+  background:var(--grad-bp) !important; color:#fff !important;
+  border:none !important; border-radius:10px !important;
+  font-weight:600 !important; font-size:.875rem !important;
+  padding:10px 20px !important; transition:all .18s !important;
+  box-shadow:0 4px 14px rgba(99,102,241,0.25) !important;
+}
+.stButton > button:hover {
+  transform:translateY(-1px) !important;
+  box-shadow:0 6px 20px rgba(99,102,241,0.35) !important;
+}
+[data-testid="stDownloadButton"] > button {
+  background:linear-gradient(135deg,#10B981,#059669) !important;
+  color:#fff !important; border:none !important;
+  border-radius:10px !important; font-weight:600 !important;
+  box-shadow:0 4px 14px rgba(16,185,129,0.28) !important;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width:3px; height:3px; }
+::-webkit-scrollbar-track { background:rgba(238,242,255,0.5); }
+::-webkit-scrollbar-thumb { background:rgba(99,102,241,0.25); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:rgba(99,102,241,0.45); }
+
 /* ══════════════════════════════════════════════════════════
-   PREMIUM DATA TABLE  —  SaaS Analytics style
-   ══════════════════════════════════════════════════════════ */
+   PREMIUM DATA TABLE
+══════════════════════════════════════════════════════════ */
 .ptbl-outer {
-  background: rgba(255,255,255,0.92);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 32px rgba(14,165,233,0.09), 0 1px 4px rgba(0,0,0,0.04);
-  border: 1px solid rgba(14,165,233,0.10);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  margin-bottom: 1.5rem;
-  overflow-x: auto;
+  background: rgba(255,255,255,0.97);
+  border-radius: 18px; overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(99,102,241,0.08);
+  backdrop-filter: blur(16px);
+  margin-bottom: 1.5rem; overflow-x: auto;
 }
-.ptbl-outer table {
-  width: 100%; border-collapse: collapse;
-  font-family: 'Inter', sans-serif;
-}
-.ptbl-outer thead {
-  position: sticky; top: 0; z-index: 2;
-}
+.ptbl-outer table { width:100%; border-collapse:collapse; font-family:'Inter',sans-serif; }
+.ptbl-outer thead { position:sticky; top:0; z-index:2; }
 .ptbl-outer thead tr {
-  background: linear-gradient(135deg,rgba(14,165,233,0.07) 0%,rgba(99,102,241,0.05) 100%);
-  border-bottom: 1.5px solid rgba(14,165,233,0.12);
+  background:linear-gradient(135deg,rgba(238,242,255,0.95),rgba(245,240,255,0.7));
+  border-bottom:1.5px solid rgba(99,102,241,0.10);
 }
 .ptbl-outer th {
-  padding: 13px 18px;
-  font-size: .5625rem; font-weight: 700;
-  letter-spacing: .13em; text-transform: uppercase;
-  color: #64748b; text-align: left; white-space: nowrap;
-  font-family: 'Inter', sans-serif;
+  padding:14px 18px; font-size:.5625rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:#64748b;
+  text-align:left; white-space:nowrap; font-family:'Inter',sans-serif;
 }
 .ptbl-outer td {
-  padding: 11px 18px;
-  font-size: .8125rem; color: #1e293b;
-  border-bottom: 1px solid rgba(14,165,233,0.05);
-  font-family: 'Inter', sans-serif;
-  white-space: nowrap;
+  padding:12px 18px; font-size:.8125rem; color:#1e293b;
+  border-bottom:1px solid rgba(99,102,241,0.05);
+  font-family:'Inter',sans-serif; white-space:nowrap;
 }
-.ptbl-outer tbody tr { transition: background .14s ease; }
+.ptbl-outer tbody tr { transition:all .13s ease; }
 .ptbl-outer tbody tr:hover td {
-  background: rgba(14,165,233,0.05);
-  box-shadow: inset 3px 0 0 rgba(14,165,233,0.30);
+  background:rgba(99,102,241,0.04);
+  box-shadow:inset 3px 0 0 rgba(99,102,241,0.25);
 }
-.ptbl-outer tbody tr:last-child td { border-bottom: none; }
+.ptbl-outer tbody tr:last-child td { border-bottom:none; }
 .ptbl-outer .td-num {
-  font-family: 'Manrope', sans-serif;
-  font-weight: 700; color: #0f172a;
-  font-variant-numeric: tabular-nums;
+  font-family:'Manrope',sans-serif; font-weight:700;
+  color:#0f172a; font-variant-numeric:tabular-nums;
 }
 .ptbl-outer .td-score {
-  font-family: 'Manrope', sans-serif;
-  font-weight: 800; font-size: .875rem;
+  font-family:'Manrope',sans-serif; font-weight:800; font-size:.875rem;
 }
 .ptbl-outer .td-chip {
-  display: inline-flex; align-items: center;
-  padding: 3px 9px; border-radius: 5px;
-  font-size: .625rem; font-weight: 600; letter-spacing: .05em;
-  white-space: nowrap;
+  display:inline-flex; align-items:center;
+  padding:3px 10px; border-radius:20px;
+  font-size:.5625rem; font-weight:700; letter-spacing:.06em; white-space:nowrap;
 }
 .ptbl-outer .chip-blue   { background:rgba(14,165,233,0.10); color:#0369a1; }
 .ptbl-outer .chip-green  { background:rgba(16,185,129,0.10); color:#047857; }
-.ptbl-outer .chip-purple { background:rgba(139,92,246,0.10); color:#6d28d9; }
+.ptbl-outer .chip-purple { background:rgba(99,102,241,0.10); color:#4338CA; }
 .ptbl-outer .chip-amber  { background:rgba(245,158,11,0.10); color:#b45309; }
 .ptbl-outer .chip-red    { background:rgba(239,68,68,0.10);  color:#b91c1c; }
-.ptbl-outer .chip-gray   { background:rgba(107,114,128,0.10);color:#374151; }
+.ptbl-outer .chip-gray   { background:rgba(99,102,241,0.07); color:#475569; }
 .ptbl-outer .td-bar-wrap { display:flex; align-items:center; gap:8px; min-width:90px; }
-.ptbl-outer .td-bar-bg   { flex:1; height:3px; background:rgba(14,165,233,0.10); border-radius:3px; overflow:hidden; }
+.ptbl-outer .td-bar-bg   { flex:1; height:3px; background:rgba(99,102,241,0.08); border-radius:3px; overflow:hidden; }
 .ptbl-outer .td-bar-fill { height:100%; border-radius:3px; }
 </style>
 """, unsafe_allow_html=True)
@@ -819,55 +968,83 @@ NAV = [
     ("veille",     "Veille & Tendances"),
     ("export",     "Rapports & Export"),
 ]
+NAV_ICONS = {
+    "dashboard": "◈",
+    "scoring":   "▸",
+    "meta":      "◉",
+    "perf":      "⚡",
+    "backlinks": "⊕",
+    "compare":   "⊞",
+    "veille":    "◎",
+    "export":    "↑",
+}
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SIDEBAR
 # ══════════════════════════════════════════════════════════════════════════════
 with st.sidebar:
-    api_pill = (
-        '<span style="background:rgba(16,185,129,0.12);color:#059669;'
-        'border:1px solid rgba(16,185,129,0.25);'
-        'border-radius:6px;padding:2px 8px;font-size:.6rem;font-weight:700;'
-        'letter-spacing:.08em;text-transform:uppercase">Serper actif</span>'
-        if serper_ok else
-        '<span style="background:rgba(14,165,233,0.08);color:#0369a1;'
-        'border:1px solid rgba(14,165,233,0.18);'
-        'border-radius:6px;padding:2px 8px;font-size:.6rem;font-weight:600;'
-        'letter-spacing:.08em;text-transform:uppercase">Proxy CTR</span>'
-    )
+    # ── LOGO AREA ──────────────────────────────────────────────────────────────
     st.markdown(f"""
-    <div style="padding:2rem 1.5rem 1.5rem">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:.35rem">
-        <div style="width:30px;height:30px;border-radius:8px;
-                    background:linear-gradient(135deg,#0EA5E9,#6366F1);
+    <div style="padding:1.75rem 1.5rem 1.25rem;position:relative">
+
+      <!-- Ambient glow behind logo -->
+      <div style="position:absolute;top:20px;left:20px;width:60px;height:60px;border-radius:50%;
+                  background:radial-gradient(circle,rgba(14,165,233,0.25),transparent 70%);
+                  pointer-events:none"></div>
+
+      <!-- Logo row -->
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:.5rem;position:relative">
+        <!-- Icon badge -->
+        <div style="width:38px;height:38px;border-radius:12px;flex-shrink:0;
+                    background:linear-gradient(135deg,#0EA5E9 0%,#6366F1 100%);
                     display:flex;align-items:center;justify-content:center;
-                    box-shadow:0 4px 12px rgba(14,165,233,0.35)">
-          <span style="font-family:Manrope,sans-serif;font-size:.85rem;font-weight:800;color:#fff">S</span>
+                    box-shadow:0 6px 20px rgba(14,165,233,0.38),0 2px 6px rgba(99,102,241,0.28),
+                               inset 0 1px 0 rgba(255,255,255,0.25)">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 1.5L17 5.5V14.5L10 18.5L3 14.5V5.5L10 1.5Z"
+                  fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.7)" stroke-width="1"/>
+            <circle cx="10" cy="10" r="2.5" fill="white" opacity="0.95"/>
+            <circle cx="10" cy="4" r="1.2" fill="white" opacity="0.7"/>
+            <circle cx="15.2" cy="7" r="1.2" fill="white" opacity="0.6"/>
+            <circle cx="15.2" cy="13" r="1.2" fill="white" opacity="0.5"/>
+            <line x1="10" y1="7.5" x2="10" y2="5.2" stroke="white" stroke-width=".9" opacity=".5"/>
+            <line x1="12.1" y1="8.5" x2="14.2" y2="7.4" stroke="white" stroke-width=".9" opacity=".4"/>
+          </svg>
         </div>
-        <div style="font-family:Manrope,sans-serif;font-size:1.15rem;font-weight:800;
-                    color:#0f172a;letter-spacing:-.025em;line-height:1">
-          Sen<span style="background:linear-gradient(135deg,#0EA5E9,#6366F1);
-                          -webkit-background-clip:text;-webkit-text-fill-color:transparent">Web</span>Stats
+        <!-- Brand name -->
+        <div>
+          <div style="font-family:Manrope,sans-serif;font-size:1.2rem;font-weight:900;
+                      color:#0f172a;letter-spacing:-.03em;line-height:1.1">
+            Sen<span style="background:linear-gradient(135deg,#0EA5E9,#6366F1);
+                            -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+                            background-clip:text">Web</span>Stats
+          </div>
+          <div style="font-family:Inter,sans-serif;font-size:.5rem;font-weight:600;
+                      color:rgba(15,23,42,0.32);letter-spacing:.2em;text-transform:uppercase;
+                      margin-top:1px">National Observatory</div>
         </div>
       </div>
-      <div style="font-family:Inter,sans-serif;font-size:.5625rem;font-weight:600;
-                  color:rgba(15,23,42,0.35);letter-spacing:.18em;
-                  text-transform:uppercase;margin-bottom:.75rem">
-        National Observatory
+
+      <!-- Server status badge -->
+      <div class="sb-status" style="margin-top:.6rem">
+        <span class="sb-dot"></span>
+        Server Active &nbsp;·&nbsp; {n_sites} sites
       </div>
-      <div>{api_pill}</div>
     </div>
-    <div style="height:1px;background:rgba(14,165,233,0.10);margin:0 1.5rem .5rem"></div>
-    <div style="padding:.5rem 1.5rem .25rem;font-family:Inter,sans-serif;font-size:.5625rem;
-                font-weight:700;color:rgba(15,23,42,0.28);letter-spacing:.18em;
-                text-transform:uppercase">Navigation</div>
+
+    <div class="sb-div"></div>
+    <div class="sb-section">Navigation</div>
     <div style="padding:0 .75rem">
     """, unsafe_allow_html=True)
 
-    for pid, label in NAV:
+    MAIN_NAV = [("dashboard","◈  Dashboard"),("scoring","▸  Scoring & Trafic"),
+                ("meta","◉  Metadonnees"),("perf","⚡  Performance"),
+                ("backlinks","⊕  Backlinks"),("compare","⊞  Comparaison")]
+
+    for pid, label in MAIN_NAV:
         if st.session_state.page == pid:
-            st.markdown(f'<div class="nav-active">{label}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="nav-active"><span class="ni">{label.split()[0]}</span>{" ".join(label.split()[1:])}</div>', unsafe_allow_html=True)
         else:
             if st.button(label, key=f"nav_{pid}", use_container_width=True):
                 st.session_state.page = pid
@@ -875,28 +1052,60 @@ with st.sidebar:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Filtre secteur
+    # ── CTA SECTION ────────────────────────────────────────────────────────────
+    st.markdown('<div class="sb-div"></div><div class="sb-section">Analytics Tools</div>', unsafe_allow_html=True)
+    st.markdown('<div style="padding:0 .75rem">', unsafe_allow_html=True)
+
+    # Veille & Tendances — gradient CTA
+    if st.session_state.page == "veille":
+        st.markdown('<div class="nav-active"><span class="ni">◎</span>Veille &amp; Tendances</div>', unsafe_allow_html=True)
+    else:
+        st.markdown('<div class="nav-cta-wrap">', unsafe_allow_html=True)
+        if st.button("◎  Veille & Tendances", key="nav_veille", use_container_width=True):
+            st.session_state.page = "veille"
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    # Rapports & Export
+    if st.session_state.page == "export":
+        st.markdown('<div class="nav-active"><span class="ni">↑</span>Rapports &amp; Export</div>', unsafe_allow_html=True)
+    else:
+        st.markdown('<div class="nav-export-wrap">', unsafe_allow_html=True)
+        if st.button("↑  Rapports & Export", key="nav_export", use_container_width=True):
+            st.session_state.page = "export"
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # ── SECTEUR FILTER ─────────────────────────────────────────────────────────
     st.markdown("""
-    <div style="height:1px;background:rgba(14,165,233,0.10);margin:1rem 1.5rem .75rem"></div>
-    <div style="padding:.25rem 1.5rem .5rem;font-family:Inter,sans-serif;font-size:.5625rem;
-                font-weight:700;color:rgba(15,23,42,0.28);letter-spacing:.18em;
-                text-transform:uppercase">Secteur</div>
-    <div style="padding:0 .75rem">
+    <div class="sb-div"></div>
+    <div class="sb-section">Secteur</div>
+    <div style="padding:0 .75rem .5rem">
     """, unsafe_allow_html=True)
     cats_df  = q("SELECT DISTINCT category FROM sites ORDER BY category")
     cat_opts = ["Tous secteurs"] + (list(cats_df["category"].values) if not cats_df.empty else [])
     cat_f    = st.selectbox("cat", cat_opts, label_visibility="collapsed")
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Footer
+    # ── FOOTER ─────────────────────────────────────────────────────────────────
     st.markdown(f"""
-    <div style="position:absolute;bottom:0;left:0;right:0;
-                padding:1rem 1.5rem;
-                border-top:1px solid rgba(14,165,233,0.10);
-                background:rgba(248,250,252,0.8)">
-      <div style="font-family:Inter,sans-serif;font-size:.5625rem;
-                  color:rgba(15,23,42,0.35);line-height:2;letter-spacing:.04em">
-        {n_sites} sites · 5 secteurs<br>{now}
+    <div style="position:absolute;bottom:0;left:0;right:0;padding:1rem 1.5rem;
+                border-top:1px solid rgba(99,102,241,0.08);
+                background:linear-gradient(135deg,rgba(238,242,255,0.6),rgba(245,240,255,0.5))">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-family:Inter,sans-serif;font-size:.5rem;font-weight:500;
+                    color:rgba(15,23,42,0.35);line-height:1.9;letter-spacing:.03em">
+          5 secteurs · Sénégal<br>
+          <span style="color:rgba(15,23,42,0.22)">{now}</span>
+        </div>
+        <div style="width:28px;height:28px;border-radius:8px;
+                    background:linear-gradient(135deg,rgba(14,165,233,0.12),rgba(99,102,241,0.08));
+                    display:flex;align-items:center;justify-content:center;
+                    border:1px solid rgba(99,102,241,0.10)">
+          <span style="font-size:.65rem">🇸🇳</span>
+        </div>
       </div>
     </div>
     """, unsafe_allow_html=True)
@@ -1636,32 +1845,109 @@ elif page == "veille":
         fig_rb.update_layout(**lay_rb)
         st.plotly_chart(fig_rb, use_container_width=True, config={"displayModeBar": False})
 
-        # Opportunites — funnel
+        # Opportunites — dumbbell chart trafic actuel vs potentiel
         section_label("Pipeline d'opportunites de croissance")
         df_opp = df_all.copy()
-        df_opp["score_qualite_proj"] = df_opp["score_qualite"].apply(lambda x: min(90, x+30))
-        df_opp["score_global_proj"]  = (df_opp["score_autorite"]*0.45 + df_opp["score_qualite_proj"]*0.35 + df_opp["score_technique"]*0.20).round(1)
-        df_opp["trafic_potentiel"]   = df_opp.apply(lambda r: int(CATEGORY_BASE.get(r["category"],50000)*(r["score_global_proj"]/100)**1.5), axis=1)
+        df_opp["score_qualite_proj"] = df_opp["score_qualite"].apply(lambda x: min(90, x + 30))
+        df_opp["score_global_proj"]  = (df_opp["score_autorite"] * 0.45 + df_opp["score_qualite_proj"] * 0.35 + df_opp["score_technique"] * 0.20).round(1)
+        df_opp["trafic_potentiel"]   = df_opp.apply(lambda r: int(CATEGORY_BASE.get(r["category"], 50000) * (r["score_global_proj"] / 100) ** 1.5), axis=1)
         df_opp["gap_trafic"]         = df_opp["trafic_potentiel"] - df_opp["trafic_estime"]
-        top_opp = df_opp.nlargest(10, "gap_trafic")
+        df_opp["pct_gain"]           = (df_opp["gap_trafic"] / df_opp["trafic_estime"].replace(0, 1) * 100).round(0).astype(int)
+        top_opp = df_opp.nlargest(15, "gap_trafic").sort_values("gap_trafic", ascending=True)
 
-        fig_fn = go.Figure(go.Funnel(
+        fig_db = go.Figure()
+
+        # Ligne connecteur (dumbbell)
+        for _, row in top_opp.iterrows():
+            cat_c = CAT_COLORS.get(row["category"], "#0EA5E9")
+            fig_db.add_shape(
+                type="line",
+                x0=row["trafic_estime"], x1=row["trafic_potentiel"],
+                y0=row["name"], y1=row["name"],
+                line=dict(color=cat_c, width=2.5, dash="dot"),
+                opacity=0.35,
+            )
+
+        # Barre actuelle
+        fig_db.add_trace(go.Bar(
+            x=top_opp["trafic_estime"],
             y=top_opp["name"],
-            x=top_opp["gap_trafic"],
-            textinfo="value+percent initial",
-            textfont=dict(family="Inter", size=10, color="white"),
+            orientation="h",
+            name="Trafic actuel",
             marker=dict(
-                color=[CAT_COLORS.get(c,"#0EA5E9") for c in top_opp["category"]],
-                line=dict(width=1.5, color="#fff"),
+                color=[hex_alpha(CAT_COLORS.get(c, "#0EA5E9"), 0.55) for c in top_opp["category"]],
+                line=dict(width=0),
             ),
-            connector=dict(line=dict(color="#e5e7eb", width=1)),
-            hovertemplate="<b>%{y}</b><br>Gain potentiel: +%{x:,.0f} vis/mois<extra></extra>",
+            width=0.35,
+            hovertemplate="<b>%{y}</b><br>Trafic actuel : <b>%{x:,.0f}</b> vis/mois<extra></extra>",
         ))
-        lay_fn = base_layout("Gain de trafic potentiel si score qualite monte a 90", height=420,
-                             margin=dict(l=140, r=0, t=52, b=0))
-        lay_fn["yaxis"]["tickfont"] = dict(size=10, color="#374151", family="Inter")
-        fig_fn.update_layout(**lay_fn)
-        st.plotly_chart(fig_fn, use_container_width=True, config={"displayModeBar": False})
+
+        # Barre potentielle
+        fig_db.add_trace(go.Bar(
+            x=top_opp["trafic_potentiel"],
+            y=top_opp["name"],
+            orientation="h",
+            name="Trafic potentiel",
+            marker=dict(
+                color=[CAT_COLORS.get(c, "#0EA5E9") for c in top_opp["category"]],
+                line=dict(width=0),
+                opacity=0.92,
+            ),
+            width=0.35,
+            text=[f"+{fmt(g)}  (+{p}%)" for g, p in zip(top_opp["gap_trafic"], top_opp["pct_gain"])],
+            textposition="outside",
+            textfont=dict(family="Inter", size=10, color="#374151"),
+            hovertemplate=(
+                "<b>%{y}</b><br>"
+                "Potentiel : <b>%{x:,.0f}</b> vis/mois<br>"
+                "Gain estimé : <b>+%{text}</b><extra></extra>"
+            ),
+        ))
+
+        # Annotation "baseline" verticale
+        max_x = int(top_opp["trafic_potentiel"].max() * 1.22)
+        lay_db = base_layout(height=560, margin=dict(l=0, r=120, t=40, b=20))
+        lay_db.update({
+            "barmode": "overlay",
+            "xaxis": {**_GX,
+                "title": dict(text="Visites estimées / mois", font=dict(size=11, color="#9CA3AF")),
+                "tickformat": ",.0f",
+                "range": [0, max_x],
+            },
+            "yaxis": {**_GY,
+                "tickfont": dict(size=10.5, color="#374151", family="Inter"),
+                "categoryorder": "array",
+                "categoryarray": list(top_opp["name"]),
+            },
+            "legend": dict(
+                orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0,
+                bgcolor="rgba(0,0,0,0)",
+                font=dict(size=11, color="#4B5563", family="Inter"),
+            ),
+            "shapes": [dict(
+                type="line", x0=0, x1=0, y0=-0.5, y1=len(top_opp) - 0.5,
+                xref="x", yref="y",
+                line=dict(color="#E5E7EB", width=1),
+            )],
+        })
+        fig_db.update_layout(**lay_db)
+        st.plotly_chart(fig_db, use_container_width=True, config={
+            "displayModeBar": True,
+            "modeBarButtonsToRemove": ["select2d", "lasso2d", "toggleSpikelines"],
+            "displaylogo": False,
+        })
+
+        # KPIs résumé opportunités
+        total_gap  = int(top_opp["gap_trafic"].sum())
+        best_opp   = top_opp.iloc[-1]
+        avg_pct    = int(top_opp["pct_gain"].mean())
+        k1, k2, k3 = st.columns(3, gap="large")
+        for col, (lbl, val, sub, badge, color) in zip([k1, k2, k3], [
+            ("Gain total top 15",   fmt(total_gap),             "vis/mois potentielles", "Potentiel", "#10B981"),
+            ("Meilleure opportunite", best_opp["name"][:18],    f"+{fmt(best_opp['gap_trafic'])} vis", "Max gain", "#0EA5E9"),
+            ("Gain moyen",          f"+{avg_pct}%",             "si qualite SEO → 90",   "Moyenne",   "#8B5CF6"),
+        ]):
+            col.markdown(kpi_master(lbl, val, sub, badge, "badge-up", 0.7, color, 0), unsafe_allow_html=True)
 
         section_label("Facteurs de risque detectes")
         rt_tab = df_risk.sort_values("score_risque", ascending=False).head(12)[
