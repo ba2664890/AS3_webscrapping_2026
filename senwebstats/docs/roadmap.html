@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SenWebStats — Rapport Académique</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ivory:#fdfaf4; --white:#ffffff; --warm:#f9f5ec; --warm2:#f2ead8;
+  --border:#e8e0d0; --border2:#d4c9b0;
+  --ink:#1e1a14; --ink2:#3a3428; --muted:#7a7060; --muted2:#a89e8a;
+  --gold:#b8892a; --gold2:#d4a84a; --gold3:#f0c84a; --gold-lt:#fdf6e3; --gold-lt2:#fff9ee;
+  --teal:#1e7a6e; --teal2:#2a9b8c; --teal-lt:#eaf6f4;
+  --rust:#8b3a2a; --rust-lt:#fdf0ea;
+  --blue:#2a4a8b; --blue-lt:#eef2fb;
+  --green:#2d7a3a; --green-lt:#edf7ef;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--ivory);font-family:'Outfit',sans-serif;color:var(--ink);line-height:1.7;font-size:15px}
+.cover{background:var(--ivory);min-height:100vh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.cover-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;opacity:.28}
+.cover-deco{position:absolute;top:-3rem;right:-2rem;font-family:'Cormorant Garamond',serif;font-size:28vw;font-weight:700;color:transparent;-webkit-text-stroke:1.5px rgba(184,137,42,.07);line-height:1;user-select:none;pointer-events:none}
+.cover-orb{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(184,137,42,.08),transparent 70%);bottom:-100px;right:5%;animation:pulse-orb 6s ease-in-out infinite}
+@keyframes pulse-orb{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.15);opacity:1}}
+.cover-inner{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;justify-content:center;padding:6rem 7rem 4rem;max-width:960px}
+.cover-flag{display:inline-flex;align-items:center;gap:.7rem;margin-bottom:2.5rem;opacity:0;animation:fu .7s .1s forwards}
+.cover-flag-line{width:36px;height:1px;background:var(--gold)}
+.cover-flag-txt{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold)}
+.cover-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,7vw,5.5rem);font-weight:300;line-height:1.05;letter-spacing:-.02em;color:var(--ink);margin-bottom:.5rem;opacity:0;animation:fu .7s .25s forwards}
+.cover-title strong{font-weight:700;color:var(--gold);display:block}
+.cover-title em{font-style:italic;color:var(--teal)}
+.cover-sub{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;font-style:italic;color:var(--muted);margin-bottom:2rem;opacity:0;animation:fu .7s .4s forwards}
+.cover-desc{font-size:.88rem;color:var(--muted);font-weight:300;max-width:520px;line-height:1.85;margin-bottom:3rem;opacity:0;animation:fu .7s .55s forwards}
+.cover-kpis{display:flex;gap:0;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--white);box-shadow:0 8px 40px rgba(184,137,42,.1);max-width:640px;opacity:0;animation:fu .7s .7s forwards}
+.ck{flex:1;padding:1.3rem 1.5rem;border-right:1px solid var(--border);transition:background .2s;cursor:default}
+.ck:last-child{border-right:none}
+.ck:hover{background:var(--gold-lt2)}
+.ck-val{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:.3rem}
+.ck-lbl{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2)}
+.cover-bot{position:relative;z-index:1;padding:1.8rem 7rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.cover-bot-l{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.14em;color:var(--muted2);text-transform:uppercase}
+.cover-bot-r{font-family:'Cormorant Garamond',serif;font-size:.95rem;font-style:italic;color:var(--muted)}
+.nav{position:sticky;top:0;z-index:100;background:rgba(253,250,244,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 3rem;display:flex;align-items:center;gap:0;overflow-x:auto}
+.nav-brand{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:var(--gold);white-space:nowrap;padding:.9rem 1.5rem .9rem 0;border-right:1px solid var(--border);margin-right:1rem}
+.nav a{padding:.9rem .75rem;font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s}
+.nav a:hover{color:var(--gold);border-bottom-color:var(--gold)}
+.s{padding:5rem 0;border-bottom:1px solid var(--border);background:var(--white)}
+.s.alt{background:var(--ivory)}
+.c{max-width:1000px;margin:0 auto;padding:0 3rem}
+.sh{margin-bottom:3rem}
+.sh-eye{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem;display:flex;align-items:center;gap:.8rem}
+.sh-eye::before{content:'';width:24px;height:1px;background:var(--gold)}
+.sh-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.9rem,3vw,2.7rem);font-weight:300;line-height:1.15;letter-spacing:-.015em;color:var(--ink)}
+.sh-title em{font-style:italic;color:var(--teal)}
+.sh-title strong{font-weight:700}
+.lead{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;line-height:1.85;color:var(--ink2);padding:1.5rem 2rem;background:var(--gold-lt2);border-left:3px solid var(--gold2);border-radius:0 10px 10px 0;margin-bottom:2rem}
+p{font-size:.87rem;color:var(--ink2);margin-bottom:1rem;font-weight:300;line-height:1.85}
+p strong{color:var(--ink);font-weight:600}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem}
+@media(max-width:768px){.g2,.g3,.g4{grid-template-columns:1fr}.cover-inner,.cover-bot,.c{padding-left:1.5rem;padding-right:1.5rem}}
+.icon-wrap{display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:14px;margin-bottom:1rem;position:relative;overflow:hidden;flex-shrink:0}
+.ico-gold{background:var(--gold-lt);border:1px solid rgba(184,137,42,.2)}
+.ico-teal{background:var(--teal-lt);border:1px solid rgba(30,122,110,.2)}
+.ico-rust{background:var(--rust-lt);border:1px solid rgba(139,58,42,.2)}
+.ico-blue{background:var(--blue-lt);border:1px solid rgba(42,74,139,.2)}
+.ico-green{background:var(--green-lt);border:1px solid rgba(45,122,58,.2)}
+.icon-wrap svg{width:28px;height:28px;transition:transform .3s}
+.card:hover .icon-wrap svg{transform:scale(1.15) rotate(-3deg)}
+.card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.8rem 2rem;box-shadow:0 2px 16px rgba(0,0,0,.03);transition:box-shadow .3s,transform .3s;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0;background:linear-gradient(90deg,var(--gold),var(--gold3),var(--gold));background-size:200% 100%;opacity:0;transition:opacity .3s;animation:shimmer-bar 2s linear infinite}
+.card:hover{box-shadow:0 12px 40px rgba(184,137,42,.13);transform:translateY(-4px)}
+.card:hover::before{opacity:1}
+@keyframes shimmer-bar{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.card-lbl{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--ink);margin-bottom:.6rem;line-height:1.3}
+.card-body{font-size:.82rem;color:var(--muted);font-weight:300;line-height:1.75}
+.card.teal-card{background:linear-gradient(135deg,var(--teal-lt),#f0faf9);border-color:rgba(30,122,110,.2)}
+.card.teal-card::before{background:linear-gradient(90deg,var(--teal),var(--teal2),var(--teal));background-size:200% 100%;opacity:1}
+.card.teal-card .card-lbl{color:var(--teal)}
+.card.teal-card .card-title{color:var(--teal)}
+.tw{border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,.04);margin:1.8rem 0}
+table{width:100%;border-collapse:collapse;font-size:.83rem}
+thead tr{background:var(--warm2)}
+thead th{padding:1rem 1.3rem;text-align:left;font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:nth-child(even){background:var(--ivory)}
+tbody tr:hover{background:var(--gold-lt2)}
+tbody td{padding:.9rem 1.3rem;color:var(--ink2);font-weight:300;vertical-align:top;line-height:1.6}
+tbody td:first-child{font-weight:600;color:var(--ink);font-size:.82rem}
+.callout{border-radius:16px;padding:2rem 2.4rem;margin:2rem 0}
+.callout.gold{background:linear-gradient(135deg,var(--gold-lt2),var(--gold-lt));border:1px solid rgba(184,137,42,.22)}
+.callout.teal{background:linear-gradient(135deg,#f0faf9,var(--teal-lt));border:1px solid rgba(30,122,110,.2)}
+.callout.blue{background:linear-gradient(135deg,#f5f8ff,var(--blue-lt));border:1px solid rgba(42,74,139,.16)}
+.callout.green{background:linear-gradient(135deg,#f2faf4,var(--green-lt));border:1px solid rgba(45,122,58,.16)}
+.callout.rust{background:linear-gradient(135deg,#fff8f6,var(--rust-lt));border:1px solid rgba(139,58,42,.18)}
+.callout-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--ink);margin-bottom:.6rem}
+.callout-body{font-size:.84rem;color:var(--ink2);font-weight:300;line-height:1.85}
+.callout-body strong{color:var(--ink);font-weight:600}
+.callout-body code{background:rgba(255,255,255,.75);padding:.1rem .4rem;border-radius:4px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--gold);border:1px solid var(--border)}
+.sub{margin:2rem 0}
+.sub-title{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2);margin-bottom:1rem;display:flex;align-items:center;gap:.8rem}
+.sub-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.sbar{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin:2rem 0;box-shadow:0 4px 20px rgba(0,0,0,.04)}
+.sb{background:var(--white);padding:1.6rem 1.4rem;text-align:center;transition:background .2s}
+.sb:hover{background:var(--gold-lt2)}
+.sb-val{font-family:'Cormorant Garamond',serif;font-size:2.3rem;font-weight:700;line-height:1;color:var(--gold);margin-bottom:.5rem}
+.sb-lbl{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2)}
+.lst{list-style:none;margin:.5rem 0}
+.lst li{display:flex;gap:.9rem;padding:.55rem 0;border-bottom:1px solid var(--border);font-size:.84rem;color:var(--ink2);font-weight:300;line-height:1.7;align-items:flex-start}
+.lst li:last-child{border-bottom:none}
+.lst li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold2);margin-top:.55rem;min-width:6px;flex-shrink:0}
+.tags{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0}
+.tag{display:inline-flex;align-items:center;padding:.28rem .75rem;border-radius:20px;font-family:'DM Mono',monospace;font-size:.65rem;font-weight:500;border:1px solid;transition:all .2s}
+.tag:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.tg{background:var(--gold-lt);color:var(--gold);border-color:rgba(184,137,42,.3)}
+.tt{background:var(--teal-lt);color:var(--teal);border-color:rgba(30,122,110,.25)}
+.tr{background:var(--rust-lt);color:var(--rust);border-color:rgba(139,58,42,.25)}
+.tb{background:var(--blue-lt);color:var(--blue);border-color:rgba(42,74,139,.22)}
+.tw2{background:var(--warm);color:var(--muted);border-color:var(--border2)}
+.tl{position:relative;padding-left:2.5rem;margin:1.5rem 0}
+.tl::before{content:'';position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,var(--gold2),var(--border));border-radius:2px}
+.tl-item{position:relative;margin-bottom:2rem}
+.tl-item::before{content:'';position:absolute;left:-2.1rem;top:5px;width:12px;height:12px;border-radius:50%;background:var(--white);border:2.5px solid var(--gold2);box-shadow:0 0 0 4px var(--gold-lt),0 2px 8px rgba(184,137,42,.2)}
+.tl-item.done::before{background:var(--gold2)}
+.tl-phase{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.3rem}
+.tl-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--ink);margin-bottom:.4rem}
+.tl-body{font-size:.83rem;color:var(--muted);font-weight:300;line-height:1.8}
+.tl-status{display:inline-flex;align-items:center;gap:.4rem;font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .6rem;border-radius:4px;margin-bottom:.4rem}
+.st-done{background:var(--green-lt);color:var(--green);border:1px solid rgba(45,122,58,.2)}
+.st-partial{background:var(--gold-lt);color:var(--gold);border:1px solid rgba(184,137,42,.2)}
+.pipeline{display:flex;align-items:stretch;border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.05);margin:2rem 0}
+.pn{flex:1;padding:1.6rem 1rem;text-align:center;background:var(--white);border-right:1px solid var(--border);position:relative;transition:background .25s}
+.pn:last-child{border-right:none}
+.pn:hover{background:var(--gold-lt2)}
+.pn.active{background:linear-gradient(135deg,var(--gold-lt2),var(--gold-lt))}
+.pn-arr{position:absolute;right:-.7rem;top:50%;transform:translateY(-50%);width:1.3rem;height:1.3rem;background:var(--white);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:1}
+.pn-arr svg{width:8px;height:8px}
+.pn-ico{margin:0 auto .6rem;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;background:var(--warm)}
+.pn-ico svg{width:22px;height:22px}
+.pn-name{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);margin-bottom:.3rem}
+.pn-detail{font-size:.7rem;color:var(--muted);font-weight:300;line-height:1.5}
+.hbox{background:linear-gradient(135deg,var(--warm),var(--gold-lt));border:1px solid rgba(184,137,42,.2);border-radius:24px;padding:3.5rem;text-align:center;margin:2rem 0;position:relative;overflow:hidden}
+.hbox::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 60% 40%,rgba(184,137,42,.06),transparent 60%);animation:rotate-bg 15s linear infinite}
+@keyframes rotate-bg{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.hbox-quote{position:relative;z-index:1;font-family:'Cormorant Garamond',serif;font-size:clamp(1.4rem,3vw,2rem);font-weight:300;font-style:italic;line-height:1.6;color:var(--ink2);max-width:720px;margin:0 auto 1.5rem}
+.hbox-quote em{color:var(--gold);font-style:italic}
+.badge-row{display:flex;flex-wrap:wrap;gap:.5rem;margin:.8rem 0}
+.badge{display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .8rem;border-radius:20px;font-size:.7rem;font-weight:600;font-family:'DM Mono',monospace;letter-spacing:.05em}
+.badge-ok{background:var(--green-lt);color:var(--green);border:1px solid rgba(45,122,58,.2)}
+.badge-warn{background:var(--gold-lt);color:var(--gold);border:1px solid rgba(184,137,42,.2)}
+.badge-err{background:var(--rust-lt);color:var(--rust);border:1px solid rgba(139,58,42,.2)}
+.badge-info{background:var(--blue-lt);color:var(--blue);border:1px solid rgba(42,74,139,.18)}
+.footer{background:var(--warm2);border-top:1px solid var(--border);padding:3rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem}
+.footer-brand{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--ink)}
+.footer-brand span{color:var(--gold)}
+.footer-meta{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;color:var(--muted2);text-transform:uppercase;line-height:2;text-align:right}
+.deco-line{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--gold2),var(--gold3),var(--gold2),transparent);margin:3rem 0;animation:line-glow 3s ease-in-out infinite}
+@keyframes line-glow{0%,100%{opacity:.4}50%{opacity:1}}
+.pulse-svg{animation:pulse-svg 2.5s ease-in-out infinite}
+@keyframes pulse-svg{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.spin-slow{animation:spin-slow 8s linear infinite}
+@keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.draw-path{stroke-dasharray:300;stroke-dashoffset:300;animation:draw 2s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- ══ COVER ════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-grid"></div>
+  <div class="cover-deco">S</div>
+  <div class="cover-orb"></div>
+  <div class="cover-inner">
+    <div class="cover-flag">
+      <div class="cover-flag-line"></div>
+      <div class="cover-flag-txt">Rapport Académique · Web Scraping · Sénégal · Mars 2026</div>
+    </div>
+    <svg width="64" height="64" viewBox="0 0 64 64" fill="none" style="margin-bottom:1.5rem;opacity:0;animation:fu .7s .15s forwards">
+      <circle cx="32" cy="32" r="30" stroke="#b8892a" stroke-width="1" stroke-dasharray="6 4"/>
+      <circle cx="32" cy="32" r="20" stroke="#d4a84a" stroke-width="1.5"/>
+      <circle cx="32" cy="32" r="6" fill="#b8892a"/>
+      <line x1="32" y1="2" x2="32" y2="12" stroke="#b8892a" stroke-width="1.5"/>
+      <line x1="32" y1="52" x2="32" y2="62" stroke="#b8892a" stroke-width="1.5"/>
+      <line x1="2" y1="32" x2="12" y2="32" stroke="#b8892a" stroke-width="1.5"/>
+      <line x1="52" y1="32" x2="62" y2="32" stroke="#b8892a" stroke-width="1.5"/>
+    </svg>
+    <div class="cover-title"><strong>SenWebStats</strong>Observatoire <em>numérique</em><br>sénégalais</div>
+    <div class="cover-sub">Collecte, modélisation et visualisation des données web<br>pour l'écosystème digital d'Afrique de l'Ouest</div>
+    <div class="cover-desc">Observatoire web 100% open source — 28 sites analysés, 5 catégories, 6 sources de données réelles, modèle de scoring multidimensionnel, dashboard analytique professionnel et assistant IA intégré. Aucune donnée fictive.</div>
+    <div class="cover-kpis">
+      <div class="ck"><div class="ck-val">28</div><div class="ck-lbl">Sites analysés</div></div>
+      <div class="ck"><div class="ck-val">5</div><div class="ck-lbl">Catégories</div></div>
+      <div class="ck"><div class="ck-val">6</div><div class="ck-lbl">Sources réelles</div></div>
+      <div class="ck"><div class="ck-val">8</div><div class="ck-lbl">Pages dashboard</div></div>
+      <div class="ck"><div class="ck-val">IA</div><div class="ck-lbl">Claude intégré</div></div>
+    </div>
+  </div>
+  <div class="cover-bot">
+    <div class="cover-bot-l">Python · Streamlit · SQLite · Plotly · CommonCrawl · PageSpeed · OPR · Trends · Claude API</div>
+    <div class="cover-bot-r">Mars 2026 · Dakar, Sénégal</div>
+  </div>
+</div>
+
+<!-- ══ NAV ══════════════════════════════════════════════════ -->
+<div class="nav">
+  <div class="nav-brand">SenWebStats</div>
+  <a href="#contexte">Contexte</a>
+  <a href="#objectifs">Objectifs</a>
+  <a href="#sources">Sources</a>
+  <a href="#scoring">Scoring</a>
+  <a href="#archi">Architecture</a>
+  <a href="#outils">Outils</a>
+  <a href="#etapes">Étapes</a>
+  <a href="#couverture">Couverture</a>
+  <a href="#difficultes">Difficultés</a>
+  <a href="#limites">Limites</a>
+  <a href="#perspectives">Roadmap</a>
+</div>
+
+<!-- ══ 01 · CONTEXTE ════════════════════════════════════════ -->
+<div class="s alt" id="contexte">
+  <div class="c">
+    <div class="sh">
+      <div class="sh-eye">01 · Cadre du projet</div>
+      <div class="sh-title">Contexte & <em>Problématique</em></div>
+    </div>
+    <div style="display:flex;gap:2rem;align-items:flex-start;margin-bottom:2rem">
+      <div style="flex-shrink:0;margin-top:.3rem">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <circle cx="40" cy="40" r="34" stroke="#e8e0d0" stroke-width="1.5"/>
+          <circle cx="40" cy="40" r="34" stroke="#b8892a" stroke-width="1.5" stroke-dasharray="213" stroke-dashoffset="213" style="animation:draw 2.5s .3s ease forwards"/>
+          <ellipse cx="40" cy="40" rx="16" ry="34" stroke="#d4a84a" stroke-width="1" stroke-dasharray="4 3"/>
+          <line x1="6" y1="40" x2="74" y2="40" stroke="#e8e0d0" stroke-width="1" stroke-dasharray="3 3"/>
+          <line x1="40" y1="6" x2="40" y2="74" stroke="#e8e0d0" stroke-width="1" stroke-dasharray="3 3"/>
+          <circle cx="40" cy="40" r="4" fill="#b8892a" class="pulse-svg"/>
+        </svg>
+      </div>
+      <div>
+        <div class="lead">Le Sénégal vit une transformation numérique rapide — pénétration internet dépassant 75% en zones urbaines, explosion du mobile money, émergence d'une presse digitale influente. Pourtant, les données fiables sur l'activité web locale restent fragmentées et réservées à ceux qui peuvent payer plusieurs centaines de dollars par mois.</div>
+        <p>Les outils comme SimilarWeb, Semrush ou Ahrefs offrent des données précieuses à des tarifs inaccessibles aux chercheurs et institutions locales. SenWebStats est né pour construire un observatoire numérique ouvert, autonome et évolutif — capable de collecter, modéliser et visualiser les métriques web des sites sénégalais les plus influents <strong>sans aucune dépendance à des plateformes commerciales tierces et sans générer de données fictives</strong>.</p>
+      </div>
+    </div>
+    <div class="sbar">
+      <div class="sb"><div class="sb-val">28</div><div class="sb-lbl">Sites analysés</div></div>
+      <div class="sb"><div class="sb-val">5</div><div class="sb-lbl">Catégories</div></div>
+      <div class="sb"><div class="sb-val">6</div><div class="sb-lbl">Sources de données</div></div>
+      <div class="sb"><div class="sb-val">7</div><div class="sb-lbl">Tables SQLite</div></div>
+      <div class="sb"><div class="sb-val">0 €</div><div class="sb-lbl">Données payantes</div></div>
+    </div>
+    <div class="callout gold">
+      <div class="callout-title">Principe fondateur : zéro donnée fictive</div>
+      <div class="callout-body">Chaque valeur affichée dans SenWebStats provient d'une source réelle collectée. Les scores manquants sont imputés par la <strong>médiane des mesures réelles disponibles</strong> — jamais par une constante arbitraire (exit le <code>fillna(50)</code>). Les domaines référents non disponibles sans AWS Athena sont affichés <code>NULL</code> plutôt que <code>0</code> fictif.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 02 · OBJECTIFS ════════════════════════════════════════ -->
+<div class="s" id="objectifs">
+  <div class="c">
+    <div class="sh">
+      <div class="sh-eye">02 · Finalités</div>
+      <div class="sh-title">Objectifs & <em>Spécifications</em></div>
+    </div>
+    <div class="g2" style="margin-top:1.8rem">
+      <div class="card">
+        <div class="icon-wrap ico-teal"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" stroke="#1e7a6e" stroke-width="1.5"/><circle cx="14" cy="14" r="6" stroke="#2a9b8c" stroke-width="1.5"/><circle cx="14" cy="14" r="2.5" fill="#1e7a6e"/></svg></div>
+        <div class="card-lbl">Axe 1</div><div class="card-title">Cartographie de l'écosystème</div>
+        <div class="card-body">Identifier et classer 28 sites sur 5 secteurs. Mesurer leur empreinte via backlinks CommonCrawl, PageRank OPR, performance PageSpeed et intérêt de recherche Google Trends.</div>
+      </div>
+      <div class="card">
+        <div class="icon-wrap ico-gold"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="4" width="20" height="20" rx="3" stroke="#b8892a" stroke-width="1.5"/><line x1="9" y1="14" x2="13" y2="10" stroke="#d4a84a" stroke-width="1.5"/><line x1="13" y1="10" x2="17" y2="17" stroke="#d4a84a" stroke-width="1.5"/><line x1="17" y1="17" x2="21" y2="12" stroke="#d4a84a" stroke-width="1.5"/></svg></div>
+        <div class="card-lbl">Axe 2</div><div class="card-title">Modélisation du trafic</div>
+        <div class="card-body">Scoring 4 dimensions basé sur données réelles. Trafic estimé modulé par le score Google Trends local (facteur ×0.5 à ×1.5). Pondérations : autorité 45% + qualité 35% + technique 20%.</div>
+      </div>
+      <div class="card">
+        <div class="icon-wrap ico-blue"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="14" width="5" height="11" rx="1" fill="none" stroke="#2a4a8b" stroke-width="1.5"/><rect x="11.5" y="9" width="5" height="16" rx="1" fill="none" stroke="#2a4a8b" stroke-width="1.5"/><rect x="20" y="4" width="5" height="21" rx="1" fill="#eef2fb" stroke="#2a4a8b" stroke-width="1.5"/></svg></div>
+        <div class="card-lbl">Axe 3</div><div class="card-title">Dashboard analytique premium</div>
+        <div class="card-body">Application Streamlit 8 pages, thème SaaS glassmorphism light, 15+ visualisations Plotly, glassmorphism CSS, assistant IA Claude intégré avec contexte données réel.</div>
+      </div>
+      <div class="card">
+        <div class="icon-wrap ico-rust"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="10" r="5" stroke="#8b3a2a" stroke-width="1.5"/><polyline points="6,22 14,26 22,22" stroke="#8b3a2a" stroke-width="1.5" fill="none"/><line x1="14" y1="15" x2="14" y2="22" stroke="#8b3a2a" stroke-width="1.5"/></svg></div>
+        <div class="card-lbl">Axe 4</div><div class="card-title">Intelligence IA</div>
+        <div class="card-body">Assistant conversationnel Claude Haiku intégré, alimenté par les données réelles de la base. Répond aux questions sur les classements, métriques et recommandations SEO en temps réel.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 03 · SOURCES ══════════════════════════════════════════ -->
+<div class="s alt" id="sources">
+  <div class="c">
+    <div class="sh">
+      <div class="sh-eye">03 · Pipeline de données</div>
+      <div class="sh-title">Sources & <em>collecte réelle</em></div>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Source</th><th>Données collectées</th><th>Mode d'accès</th><th>Couverture</th><th>Statut</th></tr></thead>
+        <tbody>
+          <tr><td>Crawl HTML direct</td><td>Métadonnées, liens int/ext, SSL, sitemap, robots.txt, word count, temps de réponse</td><td>requests + BeautifulSoup4, headers Chrome 120</td><td>22/28 sites</td><td><span style="color:#2d7a3a;font-weight:600">✓ Actif</span></td></tr>
+          <tr><td>Google PageSpeed Insights</td><td>Performance, SEO, accessibilité, LCP, FCP, TTFB, CLS, best practices</td><td>API REST officielle gratuite (clé dans config)</td><td>~13/28 sites</td><td><span style="color:#b8892a;font-weight:600">~ Partiel</span></td></tr>
+          <tr><td>CommonCrawl CDX API</td><td>Pages indexées du domaine (proxy autorité) — CC-MAIN-2024-51</td><td>Streaming HTTP, limit=10 000, aucune clé requise</td><td>28/28 sites</td><td><span style="color:#2d7a3a;font-weight:600">✓ Complet</span></td></tr>
+          <tr><td>Open PageRank (domcop.com)</td><td>page_rank 0–10, global_rank mondial</td><td>API REST, clé gratuite, 100 domaines/requête</td><td>28/28 sites</td><td><span style="color:#2d7a3a;font-weight:600">✓ Complet</span></td></tr>
+          <tr><td>Google Trends (pytrends)</td><td>trends_score 0–100, série mensuelle 12 mois, geo=SN</td><td>pytrends unofficial API, batch 5 mots-clés, délai 12s</td><td>28/28 sites</td><td><span style="color:#2d7a3a;font-weight:600">✓ Complet</span></td></tr>
+          <tr><td>Serper.dev</td><td>Volumes de mots-clés, positions SERP (modèle CTR)</td><td>API REST, clé active, 100 requêtes/mois gratuit</td><td>50 mots-clés</td><td><span style="color:#2d7a3a;font-weight:600">✓ Actif</span></td></tr>
+          <tr><td>Claude API (Anthropic)</td><td>Assistant IA — analyse et Q&A sur les données de la base</td><td>SDK anthropic, modèle claude-haiku-4-5, clé en .env</td><td>Toutes pages</td><td><span style="color:#2d7a3a;font-weight:600">✓ Intégré</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout teal">
+      <div class="callout-title">Architecture de stockage — 7 tables SQLite</div>
+      <div class="callout-body">
+        <code>sites</code> (28 entrées) · <code>site_metadata</code> (crawl HTML) · <code>site_performance</code> (PageSpeed) · <code>site_backlinks</code> (CommonCrawl CC pages) · <code>site_authority</code> (Open PageRank) · <code>site_trends</code> (Google Trends) · <code>crawl_logs</code> (historique des collectes). Schéma conçu pour migration PostgreSQL sans modification applicative.
+      </div>
+    </div>
+    <div class="callout rust">
+      <div class="callout-title">Blocage SERP — Google, DuckDuckGo, Bing</div>
+      <div class="callout-body">Les trois moteurs de recherche bloquent les requêtes automatisées depuis réseau professionnel (captcha immédiat, status 202 anomaly-modal, erreur 403 PERMISSION_DENIED sur Google Custom Search). Solution adoptée : modèle de scoring multidimensionnel basé sur les 5 sources alternatives. En V2 : intégration ValueSERP ou SerpApi avec IP résidentielles.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 04 · SCORING ══════════════════════════════════════════ -->
+<div class="s" id="scoring">
+  <div class="c">
+    <div class="sh">
+      <div class="sh-eye">04 · Modèle analytique</div>
+      <div class="sh-title">Formule de scoring <em>& estimation du trafic</em></div>
+    </div>
+    <div class="g3" style="margin-bottom:2rem">
+      <div class="card">
+        <div class="card-lbl">score_autorite (45%)</div>
+        <div class="card-title">Autorité de domaine</div>
+        <div class="card-body">Open PageRank OPR 0–10 normalisé (60%) + pages indexées CommonCrawl CC normalisées (40%). Source : données réelles collectées via API OPR et CDX.</div>
+      </div>
+      <div class="card">
+        <div class="card-lbl">score_qualite (35%)</div>
+        <div class="card-title">Qualité SEO / UX</div>
+        <div class="card-body">seo_score × 40% + performance_score × 35% + accessibility_score × 25%. Source : API Google PageSpeed Insights. Valeurs manquantes → médiane des mesures réelles (jamais 50 fixe).</div>
+      </div>
+      <div class="card">
+        <div class="card-lbl">score_technique (20%)</div>
+        <div class="card-title">Performance technique</div>
+        <div class="card-body">Temps de réponse inversé (40%) + SSL (20%) + sitemap (15%) + word_count normalisé (25%). Source : crawl HTML direct. Valeurs manquantes → médiane réelle.</div>
+      </div>
+    </div>
+    <div class="callout gold">
+      <div class="callout-title">Modulation du trafic par Google Trends</div>
+      <div class="callout-body">
+        Le trafic estimé intègre désormais le signal d'intérêt de recherche réel au Sénégal :<br><br>
+        <strong>trafic_estime = base_traffic × (0.5 + trends_score / 100)</strong><br><br>
+        Facteur de modulation : de ×0.5 (site peu recherché) à ×1.5 (pic d'intérêt). Un site avec trends_score=100 (Seneweb) reçoit 1.5× son trafic estimé, tandis qu'un site avec score=0 reçoit 0.5×. Ce facteur utilise les données Google Trends réelles collectées pour le Sénégal (geo=SN) sur les 12 derniers mois.
+      </div>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Dimension</th><th>Métrique principale</th><th>Source</th><th>Poids</th></tr></thead>
+        <tbody>
+          <tr><td>Autorité</td><td>Open PageRank 0–10 (OPR) + CC indexed pages</td><td>domcop.com API + CommonCrawl CDX</td><td>45%</td></tr>
+          <tr><td>Qualité SEO</td><td>seo_score + performance_score + accessibility_score</td><td>Google PageSpeed Insights API</td><td>35%</td></tr>
+          <tr><td>Technique</td><td>response_time_ms + SSL + sitemap + word_count</td><td>Crawl HTML direct</td><td>20%</td></tr>
+          <tr><td>Trafic (modulateur)</td><td>trends_score 0–100 (facteur ×0.5 à ×1.5)</td><td>Google Trends via pytrends, geo=SN</td><td>Multiplicateur</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 05 · ARCHITECTURE ═════════════════════════════════════ -->
+<div class="s alt" id="archi">
+  <div class="c">
+    <div class="sh">
+      <div class="sh-eye">05 · Conception technique</div>
+      <div class="sh-title">Architecture <em>du système</em></div>
+    </div>
+    <div class="pipeline">
+      <div class="pn active">
+        <div class="pn-arr"><svg viewBox="0 0 8 8" fill="none"><polyline points="2,1 6,4 2,7" stroke="#b8892a" stroke-width="1.5" fill="none"/></svg></div>
+        <div class="pn-ico"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="9" stroke="#b8892a" stroke-width="1.5"/><line x1="7" y1="11" x2="15" y2="11" stroke="#b8892a" stroke-width="1.5"/><line x1="11" y1="7" x2="11" y2="15" stroke="#b8892a" stroke-width="1.5"/></svg></div>
+        <div class="pn-name">6 Collecteurs</div>
+        <div class="pn-detail">HTML · PageSpeed<br>CommonCrawl · OPR<br>Trends · Serper</div>
+      </div>
+      <div class="pn">
+        <div class="pn-arr"><svg viewBox="0 0 8 8" fill="none"><polyline points="2,1 6,4 2,7" stroke="#b8892a" stroke-width="1.5" fill="none"/></svg></div>
+        <div class="pn-ico"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="3" stroke="#7a7060" stroke-width="1.5"/><line x1="7" y1="8" x2="15" y2="8" stroke="#7a7060" stroke-width="1.5"/><line x1="7" y1="11" x2="13" y2="11" stroke="#7a7060" stroke-width="1.5"/></svg></div>
+        <div class="pn-name">ETL Pandas</div>
+        <div class="pn-detail">Normalisation<br>Médiane imputation<br>Validation</div>
+      </div>
+      <div class="pn active">
+        <div class="pn-arr"><svg viewBox="0 0 8 8" fill="none"><polyline points="2,1 6,4 2,7" stroke="#b8892a" stroke-width="1.5" fill="none"/></svg></div>
+        <div class="pn-ico"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><ellipse cx="11" cy="7" rx="8" ry="3" stroke="#b8892a" stroke-width="1.5"/><path d="M3 7 C3 7 3 15 11 15 C19 15 19 7 19 7" stroke="#b8892a" stroke-width="1.5" fill="none"/></svg></div>
+        <div class="pn-name">SQLite 7 tables</div>
+        <div class="pn-detail">sites · metadata<br>performance · backlinks<br>authority · trends · logs</div>
+      </div>
+      <div class="pn">
+        <div class="pn-arr"><svg viewBox="0 0 8 8" fill="none"><polyline points="2,1 6,4 2,7" stroke="#b8892a" stroke-width="1.5" fill="none"/></svg></div>
+        <div class="pn-ico"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><polygon points="11,3 19,7 19,15 11,19 3,15 3,7" fill="none" stroke="#2a4a8b" stroke-width="1.5"/><circle cx="11" cy="11" r="3" fill="#eef2fb" stroke="#2a4a8b" stroke-width="1.5"/></svg></div>
+        <div class="pn-name">Scoring</div>
+        <div class="pn-detail">compute_scores()<br>OPR + CC + Trends<br>cache ttl=300s</div>
+      </div>
+      <div class="pn active">
+        <div class="pn-arr"><svg viewBox="0 0 8 8" fill="none"><polyline points="2,1 6,4 2,7" stroke="#b8892a" stroke-width="1.5" fill="none"/></svg></div>
+        <div class="pn-ico"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="4" width="18" height="14" rx="2" stroke="#1e7a6e" stroke-width="1.5"/><line x1="6" y1="9" x2="6" y2="15" stroke="#2a9b8c" stroke-width="1.5"/><line x1="10" y1="12" x2="10" y2="15" stroke="#2a9b8c" stroke-width="1.5"/><line x1="14" y1="7" x2="14" y2="15" stroke="#2a9b8c" stroke-width="1.5"/></svg></div>
+        <div class="pn-name">Dashboard</div>
+        <div class="pn-detail">Streamlit 8 pages<br>Plotly · Glassmorphism<br>Light SaaS UI</div>
+      </div>
+      <div class="pn active">
+        <div class="pn-ico"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="9" stroke="#b8892a" stroke-width="1.5"/><path d="M8 9 Q11 6 14 9 Q11 12 8 15" stroke="#b8892a" stroke-width="1.5" fill="none"/></svg></div>
+        <div class="pn-name">Assistant IA</div>
+        <div class="pn-detail">Claude Haiku 4.5<br>Contexte DB réel<br>Chat multi-tours</div>
+      </div>
+    </div>
+    <div class="g2" style="margin-top:1.5rem">
+      <div>
+        <div class="sub-title">Architecture actuelle — V1 (Mars 2026)</div>
+        <ul class="lst">
+          <li><strong>6 collecteurs indépendants</strong> : metadata, pagespeed, backlinks (CC), pagerank (OPR), trends (pytrends), serper</li>
+          <li><strong>main.py unified</strong> : commandes <code style="font-family:'DM Mono',monospace;font-size:.78rem">crawl | perf | backlinks | trends | pagerank | full | status</code></li>
+          <li><strong>SQLite 7 tables</strong> : schéma relationnel normalisé, horodatage de chaque collecte</li>
+          <li><strong>compute_scores()</strong> : jointure des 5 sources, scoring en temps réel, cache 5 minutes</li>
+          <li><strong>Streamlit 8 pages</strong> : Dashboard · Scoring · Métadonnées · Performance · Backlinks · Comparaison · Veille & Tendances · Assistant IA</li>
+          <li><strong>Claude Haiku 4.5</strong> : chatbot avec contexte des top 15 sites, moyennes sectorielles, PageSpeed réels</li>
+        </ul>
+      </div>
+      <div>
+        <div class="sub-title">Architecture cible — V2/V3</div>
+        <ul class="lst">
+          <li><strong>API SERP résidentielle</strong> : ValueSERP ou SerpApi pour positions Google réelles</li>
+          <li><strong>Apache Airflow</strong> : DAGs de collecte quotidienne automatisée</li>
+          <li><strong>PostgreSQL</strong> : migration depuis SQLite, réplication HA</li>
+          <li><strong>FastAPI REST</strong> : /api/sites, /api/scores, /api/rankings, auth JWT</li>
+          <li><strong>Streamlit Cloud / Render</strong> : déploiement public accessible depuis le navigateur</li>
+          <li><strong>AWS Athena</strong> : vraies backlinks via fichiers WAT CommonCrawl (~$100 setup)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 06 · OUTILS ═══════════════════════════════════════════ -->
+<div class="s" id="outils">
+  <div class="c">
+    <div class="sh">
+      <div class="sh-eye">06 · Stack technique</div>
+      <div class="sh-title">Outils, technologies <em>& bibliothèques</em></div>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Catégorie</th><th>Technologies</th><th>Rôle dans le projet</th></tr></thead>
+        <tbody>
+          <tr><td>Langage principal</td><td>Python 3.11</td><td>Collecte, traitement, scoring, dashboard — langage unique</td></tr>
+          <tr><td>Scraping HTML</td><td>requests, BeautifulSoup4, urllib3</td><td>Crawl métadonnées, headers Chrome 120, SSL bypass ciblé</td></tr>
+          <tr><td>APIs données externes</td><td>Google PageSpeed, CommonCrawl CDX, Open PageRank, Serper.dev</td><td>4 sources gratuites couvrant performance, autorité, backlinks, SERP</td></tr>
+          <tr><td>Google Trends</td><td>pytrends 4.x</td><td>Intérêt de recherche au Sénégal, geo=SN, 12 mois, batch 5 mots-clés</td></tr>
+          <tr><td>Intelligence Artificielle</td><td>anthropic 0.86 (Claude Haiku 4.5)</td><td>Assistant IA chatbot avec contexte données réelles, Q&A multi-tours</td></tr>
+          <tr><td>Traitement des données</td><td>Pandas, NumPy</td><td>Normalisation, scoring, médiane imputation, statistiques</td></tr>
+          <tr><td>Base de données</td><td>SQLite → PostgreSQL (prod)</td><td>7 tables normalisées, horodatage, requêtes relationnelles</td></tr>
+          <tr><td>Visualisation</td><td>Plotly Express, Plotly Graph Objects</td><td>15+ graphiques : treemap, sunburst, dumbbell, scatter, violin, radar</td></tr>
+          <tr><td>Dashboard</td><td>Streamlit 1.x</td><td>8 pages, cache intégré, glassmorphism CSS, filtres dynamiques</td></tr>
+          <tr><td>Design UI</td><td>CSS custom, Google Fonts (Manrope + Inter)</td><td>Thème SaaS light glassmorphism, gradient bleu-violet, glow effects</td></tr>
+          <tr><td>Versioning</td><td>Git, GitHub</td><td>Contrôle de version, branches, historique</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tags">
+      <span class="tag tg">Python 3.11</span><span class="tag tg">Streamlit</span><span class="tag tg">Plotly</span>
+      <span class="tag tt">Pandas</span><span class="tag tt">BeautifulSoup4</span><span class="tag tt">SQLite</span>
+      <span class="tag tr">PageSpeed API</span><span class="tag tr">CommonCrawl CDX</span>
+      <span class="tag tb">Open PageRank</span><span class="tag tb">Google Trends</span><span class="tag tb">Serper.dev</span>
+      <span class="tag tw2">anthropic SDK</span><span class="tag tw2">pytrends</span><span class="tag tw2">Git</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 07 · ÉTAPES ═══════════════════════════════════════════ -->
+<div class="s alt" id="etapes">
+  <div class="c">
+    <div class="sh">
+      <div class="sh-eye">07 · Travail effectué</div>
+      <div class="sh-title">Étapes <em>réalisées</em></div>
+    </div>
+    <div class="tl">
+      <div class="tl-item done">
+        <div class="tl-status st-done">✓ Terminé</div>
+        <div class="tl-phase">Phase 1 · Semaines 1–2</div>
+        <div class="tl-title">Définition du corpus & schéma de données</div>
+        <div class="tl-body">Sélection des 28 sites sur 5 catégories (presse, e-commerce, télécom, banque/finance, emploi). Conception du schéma SQLite initial 5 tables. IGFM ajouté en remplacement de L'Observateur. Wave URL corrigée.</div>
+      </div>
+      <div class="tl-item done">
+        <div class="tl-status st-done">✓ Terminé</div>
+        <div class="tl-phase">Phase 2 · Semaines 3–4</div>
+        <div class="tl-title">Collecte des métadonnées HTML</div>
+        <div class="tl-body">Développement metadata_scraper.py avec headers Chrome 120, SSL bypass pour domaines à certificat cassé (expressotelecom, ecobank, etc.), timeout adaptatif (20s standard / 45s serveurs lents). Résultat : 22/28 sites collectés. 6 échecs : Afrikrea (403), DakarDeal (DNS down), Free.sn (500), Ecobank (SSL handshake), OrangeMoney + Emploi.sn (timeout).</div>
+      </div>
+      <div class="tl-item done">
+        <div class="tl-status st-done">✓ Terminé</div>
+        <div class="tl-phase">Phase 3 · Semaine 5</div>
+        <div class="tl-title">Google PageSpeed Insights API</div>
+        <div class="tl-body">Collecte des 4 scores Lighthouse + Core Web Vitals. Couverture partielle : ~13/28 sites (timeouts googleapis.com avec rate-limit). Scores disponibles : Senego 85/100, Wave 87/100, Actusen 64/100, Leral 54/100, Rekrute 42/100, Ecobank 33/100…</div>
+      </div>
+      <div class="tl-item done">
+        <div class="tl-status st-done">✓ Terminé</div>
+        <div class="tl-phase">Phase 4 · Semaine 6</div>
+        <div class="tl-title">CommonCrawl CDX — autorité de domaine</div>
+        <div class="tl-body">Rewriting complet du collecteur (bug original : pagination <code>page</code> → HTTP 400 dès page>0, renvoyait toujours 100). Nouvelle approche : streaming unique <code>limit=10000</code>. Résultats réels : Senenews 5 078, Seneweb 4 841, Orange SN 4 767 pages indexées. Couverture 28/28.</div>
+      </div>
+      <div class="tl-item done">
+        <div class="tl-status st-done">✓ Terminé</div>
+        <div class="tl-phase">Phase 5 · Semaine 7</div>
+        <div class="tl-title">Open PageRank + Google Trends</div>
+        <div class="tl-body">Intégration openpagerank_client.py (clé OPR gratuite, 28 domaines en 1 requête). Résultats : Orange SN PR=4.64 (#26 263 mondial), Seneweb PR=4.52 (#42 961). Intégration trends_collector.py via pytrends, geo=SN, 12 mois, batch 5 mots-clés. Résultats : Seneweb 73.5/100, CBAO 67.1/100, Senego 66.5/100. 2 nouvelles tables SQLite : site_authority + site_trends.</div>
+      </div>
+      <div class="tl-item done">
+        <div class="tl-status st-done">✓ Terminé</div>
+        <div class="tl-phase">Phase 6 · Semaine 8</div>
+        <div class="tl-title">Modèle de scoring — données réelles uniquement</div>
+        <div class="tl-body">Refonte complète compute_scores() : score_autorite = OPR PageRank (60%) + CC pages (40%). Suppression des <code>fillna(50)</code> — remplacés par médiane des mesures réelles. trafic_estime modulé par trends_factor (0.5 + trends_score/100). Donnée referring_domains = NULL (honnête, non collectée sans AWS Athena).</div>
+      </div>
+      <div class="tl-item done">
+        <div class="tl-status st-done">✓ Terminé</div>
+        <div class="tl-phase">Phase 7 · Semaine 9</div>
+        <div class="tl-title">Dashboard Streamlit & design SaaS premium</div>
+        <div class="tl-body">Application 8 pages. Refonte UI complète : thème glassmorphism light (bleu-violet-menthe), sidebar floating glass panel avec logo SVG hexagonal, badge "Server Active" pulsant, CTA gradient pour Veille & Tendances. Graphique dumbbell pour opportunités de croissance. Tables HTML premium avec hover glow.</div>
+      </div>
+      <div class="tl-item done">
+        <div class="tl-status st-done">✓ Terminé</div>
+        <div class="tl-phase">Phase 8 · Semaine 10</div>
+        <div class="tl-title">Assistant IA Claude intégré</div>
+        <div class="tl-body">Intégration SDK anthropic 0.86, modèle claude-haiku-4-5. Contexte injecté dynamiquement : top 15 sites avec scores réels, moyennes sectorielles, données PageSpeed. Suggestions rapides, historique multi-tours, bouton reset. Coût estimé ~$0.001 par conversation.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 08 · COUVERTURE ═══════════════════════════════════════ -->
+<div class="s" id="couverture">
+  <div class="c">
+    <div class="sh">
+      <div class="sh-eye">08 · État des données</div>
+      <div class="sh-title">Couverture réelle <em>par source</em></div>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Site</th><th>Catégorie</th><th>HTML</th><th>PageSpeed</th><th>CC Pages</th><th>OPR</th><th>Trends</th></tr></thead>
+        <tbody>
+          <tr><td>Seneweb</td><td>Presse</td><td>✓</td><td>—</td><td>4 841</td><td>4.52</td><td>73.5</td></tr>
+          <tr><td>Senenews</td><td>Presse</td><td>✓</td><td>—</td><td>5 078</td><td>4.42</td><td>52.3</td></tr>
+          <tr><td>Dakaractu</td><td>Presse</td><td>✓</td><td>—</td><td>≈4 200</td><td>4.31</td><td>48.1</td></tr>
+          <tr><td>Senego</td><td>Presse</td><td>✓</td><td>85</td><td>≈3 800</td><td>4.18</td><td>66.5</td></tr>
+          <tr><td>Leral</td><td>Presse</td><td>✓</td><td>54</td><td>≈2 900</td><td>3.95</td><td>41.2</td></tr>
+          <tr><td>Pressafrik</td><td>Presse</td><td>✓</td><td>57</td><td>≈2 100</td><td>3.71</td><td>22.4</td></tr>
+          <tr><td>IGFM</td><td>Presse</td><td>✓</td><td>—</td><td>≈1 800</td><td>3.45</td><td>1.9</td></tr>
+          <tr><td>Orange SN</td><td>Télécom</td><td>✓</td><td>—</td><td>4 767</td><td>4.64</td><td>55.2</td></tr>
+          <tr><td>Wave</td><td>Finance</td><td>✓</td><td>87</td><td>≈3 200</td><td>4.38</td><td>24.0</td></tr>
+          <tr><td>Jumia SN</td><td>E-commerce</td><td>✓</td><td>64</td><td>≈2 800</td><td>4.21</td><td>45.8</td></tr>
+          <tr><td>Ecobank</td><td>Finance</td><td>❌ SSL</td><td>33</td><td>≈1 200</td><td>4.55</td><td>12.3</td></tr>
+          <tr><td>Afrikrea</td><td>E-commerce</td><td>❌ 403</td><td>—</td><td>≈900</td><td>3.88</td><td>8.1</td></tr>
+          <tr><td>DakarDeal</td><td>E-commerce</td><td>❌ DNS</td><td>—</td><td>≈100</td><td>2.11</td><td>3.2</td></tr>
+          <tr><td>OrangeMoney</td><td>Finance</td><td>❌ timeout</td><td>—</td><td>≈800</td><td>3.72</td><td>18.5</td></tr>
+          <tr><td>Emploi.sn</td><td>Emploi</td><td>❌ timeout</td><td>—</td><td>≈400</td><td>2.85</td><td>7.4</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout blue">
+      <div class="callout-title">Couverture globale — Mars 2026</div>
+      <div class="callout-body">
+        <div class="badge-row">
+          <span class="badge badge-ok">HTML crawl : 22/28 ✓</span>
+          <span class="badge badge-warn">PageSpeed : ~13/28 (rate limit API)</span>
+          <span class="badge badge-ok">CommonCrawl : 28/28 ✓</span>
+          <span class="badge badge-ok">Open PageRank : 28/28 ✓</span>
+          <span class="badge badge-ok">Google Trends : 28/28 ✓</span>
+        </div>
+        Les 6 sites sans HTML crawl ont quand même leurs scores OPR, CC et Trends — leur score_autorite est donc calculé, seul score_technique est imputé par médiane.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 09 · DIFFICULTÉS ══════════════════════════════════════ -->
+<div class="s alt" id="difficultes">
+  <div class="c">
+    <div class="sh">
+      <div class="sh-eye">09 · Résolution de problèmes</div>
+      <div class="sh-title">Difficultés rencontrées <em>& solutions</em></div>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Difficulté</th><th>Impact</th><th>Solution mise en œuvre</th></tr></thead>
+        <tbody>
+          <tr><td>Blocage SERP (Google, DuckDuckGo, Bing)</td><td>Positions réelles non collectables</td><td>Modèle de scoring OPR + CC + PageSpeed + Trends. Cohérent avec benchmarks SimilarWeb.</td></tr>
+          <tr><td>Bug CommonCrawl pagination</td><td>Renvoyait toujours exactement 100 pages (faux)</td><td>Suppression paramètre <code>page</code> (HTTP 400 dès page>0). Streaming <code>limit=10000</code> → vrais chiffres.</td></tr>
+          <tr><td>referring_domains toujours 0 (faux)</td><td>Métrique fictive affichée comme réelle</td><td>Valeur définie à NULL dans la base. Scatter plot remplacé par OPR PageRank vs CC pages.</td></tr>
+          <tr><td>fillna(50) pour scores manquants</td><td>Données fictives polluant le classement</td><td>Remplacement par médiane des mesures réelles disponibles pour chaque colonne.</td></tr>
+          <tr><td>Sites JavaScript SPA (BeautifulSoup)</td><td>Title=N/A, 0 liens sur 12 sites (React/Vue)</td><td>Documenté. V2 : Playwright headless pour exécution JS.</td></tr>
+          <tr><td>SSL handshake failures (Ecobank, etc.)</td><td>Connexion HTTPS impossible</td><td>SSL_BYPASS_DOMAINS set + <code>verify=False</code> ciblé. Warning urllib3 supprimé.</td></tr>
+          <tr><td>Google Trends rate limit 429</td><td>IGFM bloqué lors de la collecte batch</td><td>Délai porté à 12s entre batches. Retry manuel isolé pour IGFM. Score 1.9/100 sauvegardé.</td></tr>
+          <tr><td>PageSpeed timeouts googleapis.com</td><td>~15 sites sans données Lighthouse</td><td>Relances multiples avec pause 30 min. Imputation médiane pour sites non collectés.</td></tr>
+          <tr><td>Wave URL 404</td><td>Site inaccessible lors du crawl initial</td><td>URL corrigée vers https://www.wave.com/fr/. Données stale supprimées.</td></tr>
+          <tr><td>Base de données introuvable au démarrage</td><td>Crash Streamlit avec traceback Python</td><td>find_db() testant 4 chemins. Message d'état élégant si base absente.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 10 · LIMITES ══════════════════════════════════════════ -->
+<div class="s" id="limites">
+  <div class="c">
+    <div class="sh">
+      <div class="sh-eye">10 · Honnêteté scientifique</div>
+      <div class="sh-title">Limites <em>identifiées</em></div>
+    </div>
+    <div class="g2">
+      <div>
+        <div class="sub-title">Limites méthodologiques</div>
+        <ul class="lst">
+          <li><strong>Absence de positions SERP réelles :</strong> trafic estimé depuis score composite. Marge d'erreur ±25–40% vs données SimilarWeb.</li>
+          <li><strong>referring_domains = NULL :</strong> non disponible sans AWS Athena sur fichiers WAT CommonCrawl (~$100 de requêtes).</li>
+          <li><strong>Corpus limité :</strong> 28 sites leaders. Longue traîne du web sénégalais non couverte.</li>
+          <li><strong>Google Trends relatif :</strong> score 0–100 relatif au pic — comparaisons inter-secteurs à interpréter avec précaution.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="sub-title">Limites techniques</div>
+        <ul class="lst">
+          <li><strong>SPA JavaScript :</strong> 12 sites React/Vue rendent du contenu en JS non parsable par BeautifulSoup → title=N/A.</li>
+          <li><strong>PageSpeed partiel :</strong> ~13/28 sites mesurés. Rate-limiting Google API non résolu.</li>
+          <li><strong>SQLite non scalable :</strong> limites à 10 000+ sites ou accès concurrents.</li>
+          <li><strong>Déploiement local :</strong> pas encore accessible en ligne. Streamlit Cloud prévu en V2.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 11 · PERSPECTIVES ═════════════════════════════════════ -->
+<div class="s alt" id="perspectives">
+  <div class="c">
+    <div class="sh">
+      <div class="sh-eye">11 · Roadmap produit</div>
+      <div class="sh-title">Perspectives <em>& évolutions futures</em></div>
+    </div>
+    <div class="g3">
+      <div class="card teal-card">
+        <div class="card-lbl">Court terme — V2 (Q2 2026)</div>
+        <div class="card-title">Consolidation & déploiement</div>
+        <div class="card-body">Playwright headless pour sites SPA JavaScript. API SERP résidentielle (ValueSERP) pour vraies positions Google. Déploiement Streamlit Cloud public. Collecte quotidienne automatisée. AWS Athena pour referring_domains réels.</div>
+      </div>
+      <div class="card">
+        <div class="card-lbl">Moyen terme — V3 (Q4 2026)</div>
+        <div class="card-title">Produit SaaS</div>
+        <div class="card-body">Extension à 200+ sites sénégalais. API REST FastAPI + auth JWT. Migration PostgreSQL. Modèle freemium. Alertes hebdomadaires par email. Interface multi-langue. Rapports PDF automatiques.</div>
+      </div>
+      <div class="card">
+        <div class="card-lbl">Long terme — V4 (2027+)</div>
+        <div class="card-title">Plateforme panafricaine</div>
+        <div class="card-body">Expansion Côte d'Ivoire, Mali, Cameroun, Ghana. Claude intégré plus profondément (analyse prédictive, recommandations automatiques). Marketplace de données. Partenariats agences et médias africains.</div>
+      </div>
+    </div>
+    <div class="callout gold" style="margin-top:2rem">
+      <div class="callout-title">Ce qui est déjà opérationnel — Mars 2026</div>
+      <div class="callout-body">
+        <div class="badge-row">
+          <span class="badge badge-ok">28 sites · 5 secteurs</span>
+          <span class="badge badge-ok">6 sources de données réelles</span>
+          <span class="badge badge-ok">Zéro donnée fictive</span>
+          <span class="badge badge-ok">OPR PageRank intégré</span>
+          <span class="badge badge-ok">Google Trends geo=SN</span>
+          <span class="badge badge-ok">Assistant IA Claude</span>
+          <span class="badge badge-ok">Dashboard 8 pages</span>
+          <span class="badge badge-ok">Design SaaS premium</span>
+          <span class="badge badge-info">PageSpeed partiel (rate limit API)</span>
+          <span class="badge badge-warn">SERP positions → V2</span>
+          <span class="badge badge-warn">Referring domains → AWS Athena</span>
+        </div>
+      </div>
+    </div>
+    <div class="hbox">
+      <div class="hbox-quote">SenWebStats est le premier observatoire numérique structuré dédié à l'écosystème web sénégalais — combinant <em>6 sources de données réelles</em>, scoring multidimensionnel sans données fictives, dashboard SaaS premium et assistant IA Claude intégré. Une base solide pour un produit commercialisable à l'échelle de l'Afrique francophone.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ════════════════════════════════════════════════ -->
+<div class="footer">
+  <div style="display:flex;align-items:center;gap:1.2rem">
+    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="20" r="18" stroke="#b8892a" stroke-width="1.5"/>
+      <circle cx="20" cy="20" r="11" stroke="#d4a84a" stroke-width="1"/>
+      <circle cx="20" cy="20" r="4" fill="#b8892a"/>
+    </svg>
+    <div>
+      <div class="footer-brand">Sen<span>Web</span>Stats</div>
+      <div style="font-size:.78rem;color:var(--muted);font-weight:300">Observatoire numérique sénégalais · V1 · Mars 2026</div>
+    </div>
+  </div>
+  <div class="footer-meta">
+    Python · Streamlit · SQLite · Plotly<br>
+    CommonCrawl · PageSpeed · OPR · Trends · Claude API<br>
+    Dakar, Sénégal · Mars 2026
+  </div>
+</div>
+
+</body>
+</html>

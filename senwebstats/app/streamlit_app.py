@@ -1040,7 +1040,8 @@ with st.sidebar:
 
     MAIN_NAV = [("dashboard","◈  Dashboard"),("scoring","▸  Scoring & Trafic"),
                 ("meta","◉  Metadonnees"),("perf","⚡  Performance"),
-                ("backlinks","⊕  Backlinks"),("compare","⊞  Comparaison")]
+                ("backlinks","⊕  Backlinks"),("compare","⊞  Comparaison"),
+                ("assistant","✦  Assistant IA")]
 
     for pid, label in MAIN_NAV:
         if st.session_state.page == pid:
@@ -2136,5 +2137,375 @@ td{{padding:.55rem .7rem;border-bottom:1px solid #e5e7eb;color:#111827}}
                                 use_container_width=True, config={"displayModeBar": False})
                 st.plotly_chart(donut_gauge(dims_g[3][0], 100, dims_g[3][1], dims_g[3][2], 150),
                                 use_container_width=True, config={"displayModeBar": False})
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PAGE : ASSISTANT IA
+# ══════════════════════════════════════════════════════════════════════════════
+elif page == "assistant":
+    try:
+        from groq import Groq as _Groq
+        _GROQ_OK = True
+    except ImportError:
+        _GROQ_OK = False
+
+    st.markdown('<div class="mwrap">', unsafe_allow_html=True)
+    page_header(
+        "IA · Analyse · Insights",
+        'Assistant <span class="acc">IA</span>',
+        "Posez vos questions sur les données — l'IA analyse la base en temps réel",
+    )
+
+    # ── Styles chat ────────────────────────────────────────────────────────────
+    st.markdown("""
+    <style>
+    /* Conteneur chat */
+    .chat-wrap {
+      max-width: 820px; margin: 0 auto;
+    }
+    /* Bulle utilisateur */
+    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
+      background: linear-gradient(135deg,rgba(14,165,233,0.08),rgba(99,102,241,0.05)) !important;
+      border-radius: 16px !important;
+      border: 1px solid rgba(99,102,241,0.10) !important;
+      margin-bottom: .75rem !important;
+    }
+    /* Bulle assistant */
+    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) {
+      background: rgba(255,255,255,0.95) !important;
+      border-radius: 16px !important;
+      border: 1px solid rgba(99,102,241,0.08) !important;
+      box-shadow: 0 4px 20px rgba(99,102,241,0.07) !important;
+      margin-bottom: .75rem !important;
+    }
+    /* Input */
+    [data-testid="stChatInput"] textarea {
+      background: rgba(255,255,255,0.97) !important;
+      border: 1.5px solid rgba(99,102,241,0.18) !important;
+      border-radius: 14px !important;
+      font-family: 'Inter', sans-serif !important;
+      font-size: .9rem !important;
+      box-shadow: 0 4px 20px rgba(99,102,241,0.08) !important;
+    }
+    [data-testid="stChatInput"] textarea:focus {
+      border-color: rgba(14,165,233,0.40) !important;
+      box-shadow: 0 4px 24px rgba(14,165,233,0.14) !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    if not _GROQ_OK:
+        st.markdown('<div class="ibox">📦 Module manquant — lance : <code>pip install groq</code></div>', unsafe_allow_html=True)
+        st.stop()
+
+    _api_key = os.environ.get("GROQ_API_KEY", "")
+    if not _api_key:
+        st.markdown('<div class="ibox">Clé GROQ_API_KEY manquante dans .env</div>', unsafe_allow_html=True)
+        st.stop()
+
+    # ── Vérification clé API ────────────────────────────────────────────────────
+    @st.cache_data(ttl=120)
+    def _check_api(key: str) -> tuple[bool, str]:
+        try:
+            c = _Groq(api_key=key)
+            c.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                max_tokens=5,
+                messages=[{"role": "user", "content": "ok"}]
+            )
+            return True, ""
+        except Exception as e:
+            return False, str(e)
+
+    _api_ok, _api_err = _check_api(_api_key)
+
+    if not _api_ok:
+        st.warning(
+            f"**Erreur API Groq** : {_api_err}  \n"
+            "Vérifie ta clé sur **[console.groq.com](https://console.groq.com)**  \n\n"
+            "Le mode analyse hors-ligne reste disponible ci-dessous.",
+            icon="⚠️"
+        )
+
+    # ── Mode hors-ligne : analyse directe des données ──────────────────────────
+    def _analyse_hors_ligne(question: str) -> str:
+        """Répond aux questions fréquentes en analysant directement le DataFrame."""
+        df_a = compute_scores()
+        if df_a.empty:
+            return "Aucune donnée disponible dans la base."
+
+        q_low = question.lower()
+        lines = []
+
+        # Classement général
+        if any(w in q_low for w in ["classement", "meilleur", "top", "premier", "mieux", "classé"]):
+            top = df_a.head(10)
+            lines.append("**Classement général (top 10) :**\n")
+            for i, (_, r) in enumerate(top.iterrows(), 1):
+                lines.append(f"{i}. **{r['name']}** ({r['category']}) — score global **{r['score_global']:.1f}/100**")
+            lines.append(f"\n*Score = combinaison autorité ({r['score_autorite']:.0f}), qualité ({r['score_qualite']:.0f}), technique ({r['score_technique']:.0f})*")
+
+        # Trafic
+        elif any(w in q_low for w in ["trafic", "visites", "audience", "visiteurs"]):
+            top = df_a.nlargest(10, "trafic_estime")
+            lines.append("**Estimation de trafic mensuel (top 10) :**\n")
+            for _, r in top.iterrows():
+                lines.append(f"- **{r['name']}** : ~{fmt(int(r['trafic_estime']))} visites/mois")
+            lines.append("\n*Basé sur : PageRank OPR × pages indexées CC × score Google Trends*")
+
+        # Performance / PageSpeed
+        elif any(w in q_low for w in ["performance", "vitesse", "pagespeed", "rapide", "lent", "chargement"]):
+            perf = df_a[df_a["performance_score"] > 0].nlargest(10, "performance_score")
+            if perf.empty:
+                return "Aucune donnée PageSpeed disponible pour l'instant."
+            lines.append("**Performance PageSpeed (top 10) :**\n")
+            for _, r in perf.iterrows():
+                lines.append(f"- **{r['name']}** : perf={r['performance_score']:.0f}/100 | SEO={r['seo_score']:.0f}/100")
+            worst = df_a[df_a["performance_score"] > 0].nsmallest(3, "performance_score")
+            lines.append("\n**Sites les plus lents :**")
+            for _, r in worst.iterrows():
+                lines.append(f"- {r['name']} : {r['performance_score']:.0f}/100")
+
+        # SEO
+        elif any(w in q_low for w in ["seo", "référencement", "google", "visibilité"]):
+            seo = df_a[df_a["seo_score"] > 0].nlargest(10, "seo_score")
+            if seo.empty:
+                return "Aucune donnée SEO disponible."
+            lines.append("**Score SEO PageSpeed (top 10) :**\n")
+            for _, r in seo.iterrows():
+                lines.append(f"- **{r['name']}** : {r['seo_score']:.0f}/100")
+
+        # Autorité / PageRank
+        elif any(w in q_low for w in ["autorité", "autorite", "pagerank", "page rank", "domaine", "backlink", "lien"]):
+            auth = df_a.nlargest(10, "score_autorite")
+            lines.append("**Score d'autorité (OPR PageRank + CommonCrawl) :**\n")
+            for _, r in auth.iterrows():
+                pr = f" | PageRank={r['page_rank']:.2f}" if pd.notna(r.get("page_rank")) and r.get("page_rank",0)>0 else ""
+                lines.append(f"- **{r['name']}** : autorité={r['score_autorite']:.1f}/100{pr}")
+
+        # Tendances / Trends
+        elif any(w in q_low for w in ["tendance", "trend", "intérêt", "recherche", "populaire"]):
+            tr = df_a[df_a["trends_score"] > 0].nlargest(10, "trends_score")
+            if tr.empty:
+                return "Aucune donnée Google Trends disponible."
+            lines.append("**Intérêt de recherche Google Trends au Sénégal (top 10) :**\n")
+            for _, r in tr.iterrows():
+                lines.append(f"- **{r['name']}** : {r['trends_score']:.0f}/100")
+            lines.append("\n*Échelle 0-100 — 100 = pic maximal sur 12 mois*")
+
+        # Secteur
+        elif any(w in q_low for w in ["secteur", "presse", "ecommerce", "banque", "téléphonie", "telephonie", "emploi"]):
+            lines.append("**Moyennes par secteur :**\n")
+            for cat, grp in df_a.groupby("category"):
+                lines.append(
+                    f"**{cat.upper()}** ({len(grp)} sites) "
+                    f"| score={grp['score_global'].mean():.1f} "
+                    f"| perf={grp['performance_score'].mean():.1f} "
+                    f"| SEO={grp['seo_score'].mean():.1f} "
+                    f"| trafic≈{fmt(int(grp['trafic_estime'].mean()))}/mois"
+                )
+
+        # Risque / mauvais
+        elif any(w in q_low for w in ["risque", "problème", "faible", "mauvais", "améliorer"]):
+            worst = df_a.nsmallest(8, "score_global")
+            lines.append("**Sites en zone de risque (score global le plus bas) :**\n")
+            for _, r in worst.iterrows():
+                pb = []
+                if r["performance_score"] < 50 and r["performance_score"] > 0:
+                    pb.append(f"perf={r['performance_score']:.0f}")
+                if r["seo_score"] < 70 and r["seo_score"] > 0:
+                    pb.append(f"SEO={r['seo_score']:.0f}")
+                if r["score_autorite"] < 20:
+                    pb.append("autorité faible")
+                prob_str = " | ".join(pb) if pb else "données partielles"
+                lines.append(f"- **{r['name']}** (score={r['score_global']:.1f}) — {prob_str}")
+
+        # Comparaison deux sites
+        else:
+            # Cherche si un nom de site est mentionné
+            matched = []
+            for _, r in df_a.iterrows():
+                if r["name"].lower() in q_low or r["domain"].lower().split(".")[0] in q_low:
+                    matched.append(r)
+            if matched:
+                lines.append("**Données disponibles :**\n")
+                for r in matched[:3]:
+                    lines.append(
+                        f"### {r['name']} ({r['category']})\n"
+                        f"- Score global : **{r['score_global']:.1f}/100**\n"
+                        f"- Autorité : {r['score_autorite']:.1f} | Qualité : {r['score_qualite']:.1f} | Technique : {r['score_technique']:.1f}\n"
+                        + (f"- PageSpeed performance : {r['performance_score']:.0f}/100\n" if r['performance_score']>0 else "- PageSpeed : données non collectées\n")
+                        + (f"- SEO : {r['seo_score']:.0f}/100\n" if r['seo_score']>0 else "")
+                        + (f"- PageRank OPR : {r['page_rank']:.2f}/10\n" if pd.notna(r.get('page_rank')) and r.get('page_rank',0)>0 else "")
+                        + (f"- Trends sénégal : {r['trends_score']:.0f}/100\n" if pd.notna(r.get('trends_score')) else "")
+                        + f"- Trafic estimé : ~{fmt(int(r['trafic_estime']))}/mois"
+                    )
+            else:
+                # Réponse générale
+                lines.append(f"**Résumé de l'observatoire SenWebStats :**\n")
+                lines.append(f"- {len(df_a)} sites analysés dans 5 secteurs")
+                lines.append(f"- Score global moyen : {df_a['score_global'].mean():.1f}/100")
+                lines.append(f"- Meilleur site : **{df_a.iloc[0]['name']}** ({df_a.iloc[0]['score_global']:.1f}/100)")
+                lines.append(f"- Trafic total estimé : ~{fmt(int(df_a['trafic_estime'].sum()))}/mois\n")
+                lines.append("*Questions possibles : classement, trafic, performance, SEO, autorité, tendances, secteurs, risques, ou le nom d'un site précis.*")
+
+        return "\n".join(lines) if lines else "Je n'ai pas compris la question. Essaie : 'classement', 'trafic', 'performance', 'SEO', 'tendances', ou le nom d'un site."
+
+    # ── Contexte données injecté dans le system prompt ─────────────────────────
+    @st.cache_data(ttl=300)
+    def _build_context() -> str:
+        df = compute_scores()
+        if df.empty:
+            return "Aucune donnée disponible."
+        lines = ["## Données SenWebStats — Observatoire Web Sénégal\n"]
+        lines.append(f"Nombre de sites analysés : {len(df)}")
+        lines.append(f"Secteurs : presse, ecommerce, telephonie, banque_finance, emploi\n")
+        lines.append("### Classement global (top 15)")
+        for _, r in df.head(15).iterrows():
+            lines.append(
+                f"- {r['name']} ({r['category']}) | score={r['score_global']} "
+                f"| autorité={r['score_autorite']} | qualité={r['score_qualite']} "
+                f"| technique={r['score_technique']} | trafic≈{fmt(int(r['trafic_estime']))}/mois"
+                + (f" | PageRank={r['page_rank']:.2f}" if pd.notna(r.get('page_rank')) and r.get('page_rank',0)>0 else "")
+                + (f" | Trends={r['trends_score']:.0f}/100" if pd.notna(r.get('trends_score')) else "")
+            )
+        lines.append("\n### Moyennes par secteur")
+        for cat, grp in df.groupby("category"):
+            lines.append(
+                f"- {cat} : score moyen={grp['score_global'].mean():.1f} "
+                f"| perf={grp['performance_score'].mean():.1f} "
+                f"| SEO={grp['seo_score'].mean():.1f}"
+            )
+        lines.append("\n### Sites avec données PageSpeed disponibles")
+        perf_df = df[df["performance_score"] > 0].sort_values("performance_score", ascending=False)
+        for _, r in perf_df.head(10).iterrows():
+            lines.append(
+                f"- {r['name']} : perf={r['performance_score']:.0f} | SEO={r['seo_score']:.0f} "
+                f"| access={r['accessibility_score']:.0f} | LCP={r.get('lcp_ms',0)/1000:.1f}s"
+            )
+        return "\n".join(lines)
+
+    SYSTEM_PROMPT = """Tu es l'assistant IA de SenWebStats, un observatoire d'analyse du web sénégalais.
+Tu analyses les données réelles collectées sur 28 sites web au Sénégal (presse, e-commerce, télécom, banque, emploi).
+
+Tes capacités :
+- Répondre aux questions sur les scores, classements, performances des sites
+- Comparer des sites entre eux
+- Expliquer les métriques (score_autorite, score_qualite, score_technique, PageRank, Google Trends, etc.)
+- Identifier les points forts et faibles de chaque site
+- Donner des recommandations SEO/performance concrètes
+- Analyser les tendances par secteur
+
+Règles :
+- Réponds toujours en français
+- Sois concis mais précis — utilise les vraies données fournies
+- Quand tu cites un score, précise ce qu'il mesure
+- N'invente jamais de données : si une info est manquante dis-le
+- Utilise des emojis avec parcimonie pour structurer (✅ ⚠️ 📊)
+- Format Markdown pour les listes et comparaisons
+
+Données du contexte ci-dessous (mises à jour en temps réel depuis la base) :
+"""
+
+    # ── State messages ──────────────────────────────────────────────────────────
+    if "chat_messages" not in st.session_state:
+        st.session_state.chat_messages = []
+
+    # ── Suggestions rapides ─────────────────────────────────────────────────────
+    if not st.session_state.chat_messages:
+        st.markdown("""
+        <div style="max-width:820px;margin:0 auto 2rem">
+          <div style="font-family:Inter,sans-serif;font-size:.75rem;font-weight:600;
+                      color:var(--txt-3);letter-spacing:.1em;text-transform:uppercase;
+                      margin-bottom:1rem">Suggestions</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+        """, unsafe_allow_html=True)
+
+        suggestions = [
+            ("📊 Classement", "Quel est le top 5 des sites les mieux classés et pourquoi ?"),
+            ("⚡ Performance", "Quels sites ont les meilleures performances web (PageSpeed) ?"),
+            ("🔍 SEO", "Donne-moi une analyse SEO comparative par secteur"),
+            ("⚠️ Risques", "Quels sites sont en zone de risque technique et pourquoi ?"),
+            ("📈 Tendances", "Quels sites ont le plus d'intérêt de recherche au Sénégal ?"),
+            ("💡 Conseils", "Quelles sont les 3 recommandations prioritaires pour améliorer le web sénégalais ?"),
+        ]
+        cols = st.columns(2, gap="medium")
+        for i, (title, prompt) in enumerate(suggestions):
+            with cols[i % 2]:
+                if st.button(f"{title}\n{prompt[:55]}…" if len(prompt)>55 else f"{title}\n{prompt}",
+                             key=f"sug_{i}", use_container_width=True):
+                    st.session_state.chat_messages.append({"role": "user", "content": prompt})
+                    st.rerun()
+        st.markdown("</div></div>", unsafe_allow_html=True)
+
+    # ── Historique ──────────────────────────────────────────────────────────────
+    st.markdown('<div class="chat-wrap">', unsafe_allow_html=True)
+    for msg in st.session_state.chat_messages:
+        with st.chat_message(msg["role"], avatar="🧑" if msg["role"]=="user" else "🤖"):
+            st.markdown(msg["content"])
+
+    # ── Détection message en attente (via bouton suggestion) ────────────────────
+    _pending = (
+        st.session_state.chat_messages
+        and st.session_state.chat_messages[-1]["role"] == "user"
+        and (len(st.session_state.chat_messages) == 1 or st.session_state.chat_messages[-2]["role"] == "assistant")
+        and not st.session_state.get("_last_answered") == st.session_state.chat_messages[-1]["content"]
+    )
+
+    def _generate_answer(question: str) -> str:
+        if _api_ok:
+            try:
+                ctx = _build_context()
+                client = _Groq(api_key=_api_key)
+                response = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    max_tokens=1024,
+                    messages=[
+                        {"role": "system", "content": SYSTEM_PROMPT + "\n\n" + ctx},
+                    ] + [
+                        {"role": m["role"], "content": m["content"]}
+                        for m in st.session_state.chat_messages
+                    ],
+                )
+                return response.choices[0].message.content
+            except Exception as e:
+                return (f"⚠️ Erreur API Groq : {e}\n\n---\n\n**Mode analyse :**\n\n"
+                        + _analyse_hors_ligne(question))
+        return _analyse_hors_ligne(question)
+
+    # ── Traitement message en attente (suggestion cliquée) ──────────────────────
+    if _pending:
+        pending_q = st.session_state.chat_messages[-1]["content"]
+        with st.chat_message("assistant", avatar="🤖"):
+            with st.spinner("Analyse en cours…"):
+                answer = _generate_answer(pending_q)
+            st.markdown(answer)
+        st.session_state.chat_messages.append({"role": "assistant", "content": answer})
+        st.session_state["_last_answered"] = pending_q
+        st.rerun()
+
+    # ── Input ───────────────────────────────────────────────────────────────────
+    user_input = st.chat_input("Posez votre question sur les données web sénégalaises…")
+
+    if user_input:
+        st.session_state.chat_messages.append({"role": "user", "content": user_input})
+        with st.chat_message("user", avatar="🧑"):
+            st.markdown(user_input)
+
+        with st.chat_message("assistant", avatar="🤖"):
+            with st.spinner("Analyse en cours…"):
+                answer = _generate_answer(user_input)
+            st.markdown(answer)
+        st.session_state.chat_messages.append({"role": "assistant", "content": answer})
+        st.session_state["_last_answered"] = user_input
+
+    # ── Reset ────────────────────────────────────────────────────────────────────
+    if st.session_state.chat_messages:
+        if st.button("Nouvelle conversation", key="chat_reset"):
+            st.session_state.chat_messages = []
+            st.rerun()
+
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
