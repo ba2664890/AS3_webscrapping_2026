@@ -15,7 +15,7 @@ SITES = {
         {"name": "Sud Quotidien","url": "https://www.sudquotidien.sn",  "domain": "sudquotidien.sn"},
         {"name": "Xibaaru",      "url": "https://xibaaru.com",          "domain": "xibaaru.com"},
         {"name": "Dakarmatin",   "url": "https://www.dakarmatin.com",   "domain": "dakarmatin.com"},
-        {"name": "L'Observateur","url": "https://www.lobservateur.sn", "domain": "lobservateur.sn"},
+        {"name": "IGFM",         "url": "https://www.igfm.sn",          "domain": "igfm.sn"},
     ],
     "ecommerce": [
         {"name": "Jumia Sénégal","url": "https://www.jumia.sn",         "domain": "jumia.sn"},
@@ -33,7 +33,7 @@ SITES = {
     "banque_finance": [
         {"name": "CBAO",         "url": "https://www.cbao.sn",          "domain": "cbao.sn"},
         {"name": "Ecobank",      "url": "https://ecobank.com/sn",       "domain": "ecobank.com"},
-        {"name": "Wave",         "url": "https://www.wave.com/fr/sen",  "domain": "wave.com"},
+        {"name": "Wave",         "url": "https://www.wave.com/fr/",     "domain": "wave.com"},
         {"name": "Orange Money", "url": "https://www.orangemoney.sn",   "domain": "orangemoney.sn"},
     ],
     "emploi": [
@@ -57,6 +57,9 @@ USER_AGENTS = [
 
 SCRAPE_DELAY_MIN = 2
 SCRAPE_DELAY_MAX = 5
+
+# Sites qui nécessitent un timeout allongé (serveurs lents)
+SLOW_DOMAINS = {"orangemoney.sn", "emploi.sn", "ecobank.com", "dakardeal.com"}
 
 PAGESPEED_API_URL = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed"
 PAGESPEED_API_KEY = "AIzaSyCEj9OsTdXWAd9FzPaeVoBpOYpw-SKvt4Y"

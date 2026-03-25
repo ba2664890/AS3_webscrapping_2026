@@ -444,34 +444,63 @@ def compute_scores():
                FROM site_performance sp
                WHERE measured_at=(SELECT MAX(measured_at) FROM site_performance WHERE site_id=sp.site_id)""")
 
-    bl = q("""SELECT site_id, total_backlinks, referring_domains, backlinks_change
+    bl = q("""SELECT site_id, total_backlinks, backlinks_change
               FROM site_backlinks sb
               WHERE collected_at=(SELECT MAX(collected_at) FROM site_backlinks WHERE site_id=sb.site_id)""")
 
+    # Real authority data: Open PageRank (0-10 scale)
+    authority = q("""SELECT site_id, page_rank, global_rank
+                     FROM site_authority sa
+                     WHERE collected_at=(SELECT MAX(collected_at) FROM site_authority WHERE site_id=sa.site_id)""")
+
+    # Real search interest data: Google Trends (0-100 scale, geo=SN)
+    trends = q("""SELECT site_id, trends_score
+                  FROM site_trends st
+                  WHERE collected_at=(SELECT MAX(collected_at) FROM site_trends WHERE site_id=st.site_id)""")
+
     df = sites.copy()
-    for other in [meta, perf, bl]:
+    for other in [meta, perf, bl, authority, trends]:
         if not other.empty:
             df = df.merge(other, left_on="id", right_on="site_id", how="left")
             if "site_id" in df.columns:
                 df = df.drop(columns=["site_id"])
 
-    fills = {
-        "total_backlinks": 0, "referring_domains": 0, "backlinks_change": 0,
-        "seo_score": 50, "performance_score": 50, "accessibility_score": 50,
-        "best_practices_score": 50, "lcp_ms": 3000, "fcp_ms": 2000,
-        "ttfb_ms": 1000, "cls_score": 0.1,
-        "response_time_ms": 3000, "has_ssl": 0, "has_sitemap": 0,
-        "has_robots_txt": 0, "word_count": 0, "internal_links_count": 0,
+    # Boolean / counter columns: 0 is semantically correct for "absent"
+    zero_fills = {
+        "total_backlinks": 0, "backlinks_change": 0,
+        "has_ssl": 0, "has_sitemap": 0, "has_robots_txt": 0,
+        "word_count": 0, "internal_links_count": 0,
         "external_links_count": 0, "images_count": 0, "status_code": 200,
     }
-    for col, val in fills.items():
+    for col, val in zero_fills.items():
         if col not in df.columns:
             df[col] = val
         else:
             df[col] = df[col].fillna(val)
 
-    df["score_autorite"]  = (_normalize(df["total_backlinks"]) * 0.6 +
-                              _normalize(df["referring_domains"]) * 0.4).round(1)
+    # Ensure columns exist even if tables are empty
+    for col in ["page_rank", "global_rank", "trends_score",
+                "response_time_ms", "lcp_ms", "fcp_ms", "ttfb_ms", "cls_score",
+                "seo_score", "performance_score", "accessibility_score", "best_practices_score"]:
+        if col not in df.columns:
+            df[col] = float("nan")
+
+    # PageSpeed scores: fill missing values with median of real collected data
+    # (never hardcode 50 — use the actual distribution of available measurements)
+    for col in ["seo_score", "performance_score", "accessibility_score", "best_practices_score"]:
+        real_median = df[col].median()
+        df[col] = df[col].fillna(real_median if pd.notna(real_median) else 0.0)
+
+    # response_time_ms: fill missing with median of real measurements
+    rt_median = df["response_time_ms"].median()
+    df["response_time_ms"] = df["response_time_ms"].fillna(rt_median if pd.notna(rt_median) else 3000.0)
+
+    # score_autorite: Open PageRank (60%) + CommonCrawl indexed pages proxy (40%)
+    # OPR is 0-10 → normalize to 0-100; CC pages already normalized
+    df["page_rank"] = df["page_rank"].fillna(0.0)
+    df["score_autorite"] = (_normalize(df["page_rank"]) * 0.60 +
+                             _normalize(df["total_backlinks"]) * 0.40).round(1)
+
     df["score_qualite"]   = (df["seo_score"] * 0.40 +
                               df["performance_score"] * 0.35 +
                               df["accessibility_score"] * 0.25).round(1)
@@ -483,18 +512,26 @@ def compute_scores():
                               df["score_qualite"] * 0.35 +
                               df["score_technique"] * 0.20).round(1)
 
+    # trends_score: Google Trends interest (0-100, geo=SN) used to modulate traffic estimate
+    # Factor: 0.5 + trends/100 → range [0.5, 1.5] (no trends data → factor=1.0)
+    trends_median = df["trends_score"].median()
+    df["trends_score"] = df["trends_score"].fillna(trends_median if pd.notna(trends_median) else 50.0)
+    trends_factor = 0.5 + df["trends_score"] / 100.0
+
     if _CTR_OK:
         try:
             df = compute_ctr_scores(df)
-            df["trafic_estime"] = df["trafic_ctr"]
+            df["trafic_estime"] = (df["trafic_ctr"] * trends_factor).astype(int)
         except Exception:
-            df["trafic_estime"] = df.apply(
+            base = df.apply(
                 lambda r: int(CATEGORY_BASE.get(r["category"], 50000) * (r["score_global"] / 100) ** 1.5), axis=1)
+            df["trafic_estime"] = (base * trends_factor).astype(int)
             df["trafic_ctr"] = df["trafic_estime"]
             df["position_estimee"] = 10
     else:
-        df["trafic_estime"] = df.apply(
+        base = df.apply(
             lambda r: int(CATEGORY_BASE.get(r["category"], 50000) * (r["score_global"] / 100) ** 1.5), axis=1)
+        df["trafic_estime"] = (base * trends_factor).astype(int)
         df["trafic_ctr"] = df["trafic_estime"]
         df["position_estimee"] = 10
 
@@ -1346,17 +1383,17 @@ elif page == "backlinks":
     if df_bl.empty:
         st.markdown('<div class="ibox">Backlinks non collectes. Lance : <code>python main.py backlinks</code></div>', unsafe_allow_html=True)
     else:
+        df_bl["referring_domains"] = df_bl["referring_domains"].fillna(0)
         total_bl = int(df_bl["total_backlinks"].sum())
-        total_rd = int(df_bl["referring_domains"].sum())
         best_bl  = df_bl.loc[df_bl["total_backlinks"].idxmax(), "name"] if not df_bl.empty else "—"
-        avg_rd   = round(df_bl["referring_domains"].mean(), 0)
+        avg_bl   = round(df_bl["total_backlinks"].mean(), 0)
 
         k1, k2, k3, k4 = st.columns(4, gap="medium")
         for col, (lbl, val, sub, badge, bcls, prog, color, delay) in zip([k1,k2,k3,k4], [
-            ("Total backlinks", fmt(total_bl), "pages indexees",  "CommonCrawl", "badge-flat", 0.8,  "#0EA5E9", 0),
-            ("Dom. referents",  fmt(total_rd), "domaines uniques","Diversite",   "badge-flat", 0.7,  "#10B981", 1),
-            ("Leader autorite", best_bl[:14],  "top site",        "Max",         "badge-up",   1.0,  "#8B5CF6", 2),
-            ("Moy. dom. ref.",  str(int(avg_rd)),"par site",       "Distribution","badge-flat", 0.5,  "#F59E0B", 3),
+            ("Pages indexees CC", fmt(total_bl),    "total tous sites", "CommonCrawl", "badge-flat", 0.8,  "#0EA5E9", 0),
+            ("Moyenne par site",  str(int(avg_bl)),  "pages indexees",  "Distribution","badge-flat", 0.5,  "#10B981", 1),
+            ("Leader autorite",   best_bl[:14],      "top site",        "Max",         "badge-up",   1.0,  "#8B5CF6", 2),
+            ("Dom. referents",    "N/A",             "via AWS Athena",  "Pro",         "badge-flat", 0.0,  "#F59E0B", 3),
         ]):
             col.markdown(kpi_master(lbl, val, sub, badge, bcls, prog, color, delay), unsafe_allow_html=True)
 
@@ -1369,27 +1406,36 @@ elif page == "backlinks":
             use_container_width=True, config={"displayModeBar": False}
         )
 
+        # Open PageRank data for scatter
+        df_opr = q("""SELECT s.name, s.category, sa.page_rank, sa.global_rank
+                      FROM site_authority sa JOIN sites s ON s.id=sa.site_id
+                      WHERE sa.collected_at=(SELECT MAX(collected_at) FROM site_authority WHERE site_id=sa.site_id)""")
+
         col1, col2 = st.columns(2, gap="large")
         with col1:
-            section_label("Domaines referents vs Pages indexees")
-            fig_sc = go.Figure()
-            for cat in df_bl["category"].unique():
-                dc = df_bl[df_bl["category"] == cat]
-                c  = CAT_COLORS.get(cat, "#0EA5E9")
-                fig_sc.add_trace(go.Scatter(
-                    x=dc["referring_domains"], y=dc["total_backlinks"],
-                    mode="markers+text", name=CAT_LABEL.get(cat, cat),
-                    text=dc["name"], textposition="top center",
-                    textfont=dict(size=8, color="#6B7280", family="Inter"),
-                    marker=dict(size=14, color=c, opacity=0.85,
-                                line=dict(width=2.5, color="#fff")),
-                    hovertemplate="<b>%{text}</b><br>Dom. ref: %{x:,}<br>Pages: %{y:,}<extra></extra>",
-                ))
-            lay_sc = base_layout(height=420)
-            lay_sc["xaxis"]["title"] = dict(text="Domaines referents", font=dict(size=11, color="#9CA3AF"))
-            lay_sc["yaxis"]["title"] = dict(text="Pages indexees", font=dict(size=11, color="#9CA3AF"))
-            fig_sc.update_layout(**lay_sc)
-            st.plotly_chart(fig_sc, use_container_width=True, config={"displayModeBar": False})
+            section_label("Open PageRank vs Pages indexees (CommonCrawl)")
+            if df_opr.empty:
+                st.markdown('<div class="ibox">PageRank non collecte. Lance : <code>python main.py pagerank</code></div>', unsafe_allow_html=True)
+            else:
+                merged_sc = df_bl.merge(df_opr, on=["name","category"], how="inner")
+                fig_sc = go.Figure()
+                for cat in merged_sc["category"].unique():
+                    dc = merged_sc[merged_sc["category"] == cat]
+                    c  = CAT_COLORS.get(cat, "#0EA5E9")
+                    fig_sc.add_trace(go.Scatter(
+                        x=dc["page_rank"], y=dc["total_backlinks"],
+                        mode="markers+text", name=CAT_LABEL.get(cat, cat),
+                        text=dc["name"], textposition="top center",
+                        textfont=dict(size=8, color="#6B7280", family="Inter"),
+                        marker=dict(size=14, color=c, opacity=0.85,
+                                    line=dict(width=2.5, color="#fff")),
+                        hovertemplate="<b>%{text}</b><br>PageRank: %{x:.2f}<br>Pages CC: %{y:,}<extra></extra>",
+                    ))
+                lay_sc = base_layout(height=420)
+                lay_sc["xaxis"]["title"] = dict(text="Open PageRank (0-10)", font=dict(size=11, color="#9CA3AF"))
+                lay_sc["yaxis"]["title"] = dict(text="Pages indexees CC", font=dict(size=11, color="#9CA3AF"))
+                fig_sc.update_layout(**lay_sc)
+                st.plotly_chart(fig_sc, use_container_width=True, config={"displayModeBar": False})
 
         with col2:
             section_label("Sunburst — hierarchie secteur > site")
@@ -1398,9 +1444,14 @@ elif page == "backlinks":
                 use_container_width=True, config={"displayModeBar": False}
             )
 
-        section_label("Tableau complet")
-        d = df_bl[["name","category","domain","total_backlinks","referring_domains","backlinks_change"]].copy()
-        d.columns = ["Site","Secteur","Domaine","Pages indexees","Dom. referents","Variation"]
+        section_label("Tableau complet — Pages indexees CommonCrawl")
+        d = df_bl[["name","category","domain","total_backlinks","backlinks_change"]].copy()
+        if not df_opr.empty:
+            d = d.merge(df_opr[["name","page_rank","global_rank"]], on="name", how="left")
+            d.columns = ["Site","Secteur","Domaine","Pages CC","Variation","PageRank","Rang mondial"]
+            d["Rang mondial"] = d["Rang mondial"].apply(lambda x: fmt(int(x)) if pd.notna(x) else "—")
+        else:
+            d.columns = ["Site","Secteur","Domaine","Pages CC","Variation"]
         d["Variation"] = d["Variation"].fillna(0)
         st.markdown(html_table(d), unsafe_allow_html=True)
 
@@ -1653,7 +1704,7 @@ elif page == "export":
             </div>
             """, unsafe_allow_html=True)
             csv_cols = ["name","domain","category","score_global","score_autorite","score_qualite",
-                        "score_technique","trafic_estime","total_backlinks","referring_domains",
+                        "score_technique","trafic_estime","total_backlinks","page_rank","trends_score",
                         "performance_score","seo_score","accessibility_score","response_time_ms","has_ssl","has_sitemap"]
             csv_df    = df_all[[c for c in csv_cols if c in df_all.columns]].copy()
             csv_df.columns = [c.replace("_"," ").title() for c in csv_df.columns]

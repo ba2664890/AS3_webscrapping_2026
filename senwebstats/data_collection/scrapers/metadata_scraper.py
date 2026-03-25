@@ -15,17 +15,44 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 from config.sites import USER_AGENTS, SCRAPE_DELAY_MIN, SCRAPE_DELAY_MAX
 from database.schema import get_connection
 
-TIMEOUT = 15
+TIMEOUT_DEFAULT = 20
+TIMEOUT_SLOW    = 45   # pour les serveurs connus comme lents
+
+# Sites qui nécessitent un contournement SSL (cert expiré, geo-IP, etc.)
+SSL_BYPASS_DOMAINS = {
+    "expressotelecom.sn", "free.sn", "dakardeal.com",
+    "emploi.sn", "orangemoney.sn", "ecobank.com",
+}
+
+try:
+    from config.sites import SLOW_DOMAINS
+except ImportError:
+    SLOW_DOMAINS = {"orangemoney.sn", "emploi.sn", "ecobank.com", "dakardeal.com"}
+
+# Headers qui imitent un vrai navigateur Chrome — réduit les 403/resets
+BROWSER_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/120.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,"
+              "image/avif,image/webp,image/apng,*/*;q=0.8",
+    "Accept-Language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection":      "keep-alive",
+    "Upgrade-Insecure-Requests": "1",
+    "Sec-Fetch-Dest":  "document",
+    "Sec-Fetch-Mode":  "navigate",
+    "Sec-Fetch-Site":  "none",
+    "Cache-Control":   "max-age=0",
+}
 
 
 def get_headers():
-    return {
-        "User-Agent": random.choice(USER_AGENTS),
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "fr-FR,fr;q=0.9,en-US;q=0.8",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Connection": "keep-alive",
-    }
+    # Retourne les headers navigateur (on n'utilise plus la rotation User-Agent
+    # car les vrais UA Chrome passent mieux les filtres anti-bot)
+    return dict(BROWSER_HEADERS)
 
 
 def check_sitemap(base_url):
@@ -59,13 +86,27 @@ def scrape_metadata(url: str) -> dict:
         "images_count": 0, "images_with_alt": 0, "word_count": 0,
         "has_sitemap": False, "has_robots_txt": False, "error": None,
     }
+    # Déterminer le timeout et le mode SSL pour ce domaine
+    from urllib.parse import urlparse as _up
+    _netloc = _up(url).netloc.lstrip("www.")
+    use_ssl_bypass = any(_netloc.endswith(d) for d in SSL_BYPASS_DOMAINS)
+    timeout = TIMEOUT_SLOW if any(_netloc.endswith(d) for d in SLOW_DOMAINS) else TIMEOUT_DEFAULT
+
+    # Supprimer les warnings SSL si bypass activé
+    if use_ssl_bypass:
+        import urllib3
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
     try:
         start = time.time()
-        response = requests.get(url, headers=get_headers(), timeout=TIMEOUT, allow_redirects=True)
+        response = requests.get(
+            url, headers=get_headers(), timeout=timeout,
+            allow_redirects=True, verify=(not use_ssl_bypass)
+        )
         result["response_time_ms"] = round((time.time() - start) * 1000, 2)
         result["status_code"] = response.status_code
 
-        if response.status_code != 200:
+        if response.status_code not in (200, 301, 302):
             result["error"] = f"HTTP {response.status_code}"
             return result
 

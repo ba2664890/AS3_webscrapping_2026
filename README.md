@@ -152,3 +152,4 @@ Pour estimer le trafic comme Semrush, il faudra :
 2. Récupérer les volumes de recherche mensuels (Google Keyword Planner ou scraping)
 3. Appliquer le modèle CTR par position : `trafic = volume × CTR[position]`
 4. Agréger par site pour obtenir le trafic mensuel estimé
+python app/dashboard.py

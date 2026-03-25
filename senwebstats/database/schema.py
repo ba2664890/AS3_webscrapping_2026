@@ -94,6 +94,32 @@ def init_db():
     """)
 
     cursor.execute("""
+        CREATE TABLE IF NOT EXISTS site_authority (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            site_id      INTEGER NOT NULL,
+            collected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            page_rank    REAL,
+            global_rank  INTEGER,
+            source       TEXT DEFAULT 'openpagerank',
+            FOREIGN KEY (site_id) REFERENCES sites(id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS site_trends (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            site_id      INTEGER NOT NULL,
+            collected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            keyword      TEXT NOT NULL,
+            trends_score REAL,
+            trends_geo   TEXT DEFAULT 'SN',
+            timeframe    TEXT DEFAULT 'today 12-m',
+            trend_data   TEXT,
+            FOREIGN KEY (site_id) REFERENCES sites(id)
+        )
+    """)
+
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS crawl_logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             site_id INTEGER,
