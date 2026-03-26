@@ -58,7 +58,7 @@ st.markdown("""
    DESIGN TOKENS — LIGHT GOLD THEME
 ═══════════════════════════════════════ */
 :root {
-  --bg:         #F5F0E5;
+  --bg:         #FFFFFF;
   --card:       #FFFFFF;
   --sidebar-bg: #FDFAF4;
   --text:       #1A1A2E;
@@ -81,7 +81,7 @@ st.markdown("""
   --emerald:    #16A34A;
   --amber:      #D97706;
   --grad-bp:    linear-gradient(135deg,#C9A84C 0%,#F0D080 100%);
-  --grad-surface: linear-gradient(145deg,#F5F0E5 0%,#FDF8EE 50%,#F5F0E5 100%);
+  --grad-surface: linear-gradient(145deg,#FFFFFF 0%,#FAFAFA 50%,#FFFFFF 100%);
 }
 
 /* ═══════════════════════════════════════
@@ -119,6 +119,16 @@ st.markdown("""
 @keyframes pulse-dot {
   0%,100% { opacity:1; transform:scale(1); }
   50%     { opacity:.3; transform:scale(.6); }
+}
+@keyframes gold-rush {
+  0%   { transform:translateX(-120%) skewX(-18deg); opacity:0; }
+  25%  { opacity:1; }
+  100% { transform:translateX(280%) skewX(-18deg); opacity:0; }
+}
+@keyframes gold-particles {
+  0%   { opacity:0; transform:translateY(0) scale(0); }
+  30%  { opacity:1; }
+  100% { opacity:0; transform:translateY(-18px) scale(1.6); }
 }
 
 /* ═══════════════════════════════════════
@@ -189,28 +199,50 @@ html,body {
   border-left-color:#3D2B00;
   font-weight:700;
 }
-.nav-icon { font-size:.9rem; width:20px; text-align:center; font-style:normal; }
+.nav-icon { display:none; }
 
 /* Nav buttons (inactive) */
 [data-testid="stSidebar"] .stButton > button {
   background:transparent !important;
   color:rgba(61,43,0,0.65) !important;
-  border:none !important; border-radius:0 !important;
+  border:none !important; border-radius:4px !important;
   border-left:3px solid transparent !important;
   text-align:left !important; justify-content:flex-start !important;
-  padding:.7rem 1.25rem !important; margin:0 !important;
-  font-size:.7rem !important; font-weight:600 !important;
-  font-family:'Inter',sans-serif !important; letter-spacing:.1em !important;
+  padding:.75rem 1.25rem !important; margin:0 2px !important;
+  font-size:.68rem !important; font-weight:600 !important;
+  font-family:'Inter',sans-serif !important; letter-spacing:.12em !important;
   text-transform:uppercase !important;
-  width:100% !important; transition:all .2s ease !important;
+  width:calc(100% - 4px) !important; transition:all .25s ease !important;
   box-shadow:none !important; min-height:0 !important;
+  overflow:hidden !important; position:relative !important;
+}
+[data-testid="stSidebar"] .stButton > button::after {
+  content:'' !important;
+  position:absolute !important; top:0 !important; left:0 !important;
+  width:45% !important; height:100% !important;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,248,200,0.55) 35%,
+    rgba(240,208,128,0.85) 50%,
+    rgba(255,248,200,0.55) 65%,
+    transparent 100%) !important;
+  transform:translateX(-120%) skewX(-18deg) !important;
+  pointer-events:none !important;
+}
+[data-testid="stSidebar"] .stButton > button:hover::after {
+  animation:gold-rush .65s ease forwards !important;
 }
 [data-testid="stSidebar"] .stButton > button:hover {
-  background:rgba(255,255,255,0.25) !important;
+  background:rgba(255,255,255,0.28) !important;
   color:#3D2B00 !important;
-  border-left-color:#3D2B00 !important;
+  border-left-color:rgba(61,43,0,0.5) !important;
   transform:none !important;
-  box-shadow:none !important;
+  box-shadow:0 2px 12px rgba(61,43,0,0.12) !important;
+}
+[data-testid="stSidebar"] .stButton > button:active {
+  transform:scale(0.97) !important;
+  background:rgba(255,255,255,0.45) !important;
+  box-shadow:0 0 18px rgba(240,208,128,0.5) !important;
 }
 [data-testid="stSidebar"] .stButton > button:focus { box-shadow:none !important; }
 
@@ -490,10 +522,17 @@ html,body {
   box-shadow:0 6px 20px rgba(201,168,76,.35) !important;
 }
 [data-testid="stDownloadButton"] > button {
-  background:linear-gradient(135deg,#16A34A,#15803D) !important;
-  color:#fff !important; border:none !important;
-  border-radius:10px !important; font-weight:600 !important;
-  box-shadow:0 4px 14px rgba(22,163,74,.28) !important;
+  background:linear-gradient(135deg,#C9A84C,#F0D080) !important;
+  color:#3D2B00 !important; border:none !important;
+  border-radius:10px !important; font-weight:700 !important;
+  box-shadow:0 4px 16px rgba(201,168,76,0.35) !important;
+  letter-spacing:.06em !important;
+}
+[data-testid="stDownloadButton"] > button:hover {
+  background:linear-gradient(135deg,#8B6914,#C9A84C) !important;
+  color:#fff !important;
+  box-shadow:0 6px 22px rgba(201,168,76,0.45) !important;
+  transform:translateY(-1px) !important;
 }
 
 /* ── SCROLLBAR ── */
@@ -699,18 +738,24 @@ html,body {
    SENEGAL MAP CARD
 ══════════════════════════════════════════════════════════ */
 .map-card {
-  background:var(--card); border-radius:16px;
-  border:1px solid rgba(201,168,76,.15);
-  padding:1.25rem 1rem 1rem;
-  box-shadow:0 4px 24px rgba(0,0,0,.06);
+  background:var(--card); border-radius:18px;
+  border:1px solid rgba(201,168,76,.18);
+  padding:1.5rem 1.25rem 1.25rem;
+  box-shadow:0 6px 32px rgba(201,168,76,.1);
   animation:fadeInLeft .6s ease both;
+  transition:box-shadow .3s ease;
 }
+.map-card--hero {
+  padding:1.75rem 1.5rem 1.5rem;
+  box-shadow:0 8px 40px rgba(201,168,76,.14),0 2px 0 rgba(201,168,76,.25) inset;
+  border:1.5px solid rgba(201,168,76,.22);
+}
+.map-card--hero:hover { box-shadow:0 14px 50px rgba(201,168,76,.22); }
 .map-title {
-  font-family:'Playfair Display',serif; font-size:.85rem; font-weight:600;
+  font-family:'Playfair Display',serif; font-size:.9rem; font-weight:700;
   color:var(--gold-dark); letter-spacing:.04em; margin-bottom:.75rem;
-  text-align:center;
 }
-.sn-map { width:100%; max-width:280px; display:block; margin:0 auto; }
+.sn-map { width:100%; display:block; }
 .map-ping {
   animation:node-ping 2.4s ease-in-out infinite;
   transform-origin:center;
@@ -1211,23 +1256,22 @@ with st.sidebar:
 
     # ── MAIN NAV ───────────────────────────────────────────────────────────────
     MAIN_NAV = [
-        ("dashboard", "◈",  "Dashboard"),
-        ("scoring",   "▸",  "Scoring & Trafic"),
-        ("meta",      "◉",  "Metadonnees"),
-        ("perf",      "◆",  "Performance"),
-        ("backlinks", "⊕",  "Backlinks"),
-        ("compare",   "⊞",  "Comparaison"),
-        ("assistant", "◎",  "Assistant IA"),
+        ("dashboard", "Dashboard"),
+        ("scoring",   "Scoring & Trafic"),
+        ("meta",      "Metadonnees"),
+        ("perf",      "Performance"),
+        ("backlinks", "Backlinks"),
+        ("compare",   "Comparaison"),
+        ("assistant", "Assistant IA"),
     ]
-    for pid, icon, label in MAIN_NAV:
+    for pid, label in MAIN_NAV:
         if st.session_state.page == pid:
             st.markdown(
-                f'<div class="nav-item active">'
-                f'<span class="nav-icon">{icon}</span>{label}</div>',
+                f'<div class="nav-item active">{label}</div>',
                 unsafe_allow_html=True
             )
         else:
-            if st.button(f"{icon}  {label}", key=f"nav_{pid}", use_container_width=True):
+            if st.button(label, key=f"nav_{pid}", use_container_width=True):
                 st.session_state.page = pid
                 st.rerun()
 
@@ -1235,43 +1279,51 @@ with st.sidebar:
     st.markdown('<div class="sb-div"></div><div class="sb-section">Analytics</div>', unsafe_allow_html=True)
 
     if st.session_state.page == "veille":
-        st.markdown('<div class="nav-item active"><span class="nav-icon">◎</span>Veille &amp; Tendances</div>', unsafe_allow_html=True)
+        st.markdown('<div class="nav-item active">Veille &amp; Tendances</div>', unsafe_allow_html=True)
     else:
         st.markdown('<div class="nav-cta-wrap">', unsafe_allow_html=True)
-        if st.button("◎  Veille & Tendances", key="nav_veille", use_container_width=True):
+        if st.button("Veille & Tendances", key="nav_veille", use_container_width=True):
             st.session_state.page = "veille"
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
     if st.session_state.page == "export":
-        st.markdown('<div class="nav-item active"><span class="nav-icon">↑</span>Rapports &amp; Export</div>', unsafe_allow_html=True)
+        st.markdown('<div class="nav-item active">Rapports &amp; Export</div>', unsafe_allow_html=True)
     else:
         st.markdown('<div class="nav-export-wrap">', unsafe_allow_html=True)
-        if st.button("↑  Rapports & Export", key="nav_export", use_container_width=True):
+        if st.button("Rapports & Export", key="nav_export", use_container_width=True):
             st.session_state.page = "export"
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── SECTEUR FILTER ─────────────────────────────────────────────────────────
-    st.markdown('<div class="sb-div"></div><div class="sb-section">Secteur</div>', unsafe_allow_html=True)
-    cats_df  = q("SELECT DISTINCT category FROM sites ORDER BY category")
-    cat_opts = ["Tous secteurs"] + (list(cats_df["category"].values) if not cats_df.empty else [])
-    cat_f    = st.selectbox("cat", cat_opts, label_visibility="collapsed")
+    # ── DATE ELEGANTE (remplace le filtre secteur) ─────────────────────────────
+    cat_f = "Tous secteurs"
 
-    # ── SIDEBAR FOOTER ──────────────────────────────────────────────────────────
+    # ── SIDEBAR DATE FOOTER ─────────────────────────────────────────────────────
+    _day   = datetime.now().strftime("%d")
+    _month = datetime.now().strftime("%B").upper()
+    _year  = datetime.now().strftime("%Y")
+    _time  = datetime.now().strftime("%H:%M")
     st.markdown(f"""
-    <div style="position:absolute;bottom:0;left:0;right:0;padding:1rem 1.25rem;
+    <div style="position:absolute;bottom:0;left:0;right:0;
+                padding:1.25rem 1.25rem 1.5rem;
                 border-top:1px solid rgba(61,43,0,0.15);
-                background:rgba(61,43,0,0.08)">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div style="font-family:Inter,sans-serif;font-size:.5rem;font-weight:500;
-                    color:rgba(61,43,0,0.5);line-height:1.9;letter-spacing:.03em">
-          5 secteurs · Sénégal<br>
-          <span style="color:rgba(61,43,0,0.35)">{now}</span>
+                background:rgba(61,43,0,0.06)">
+      <div style="font-family:'Inter',sans-serif;font-size:.45rem;font-weight:700;
+                  letter-spacing:.25em;text-transform:uppercase;
+                  color:rgba(61,43,0,0.35);margin-bottom:.5rem">Aujourd'hui</div>
+      <div style="display:flex;align-items:baseline;gap:.4rem">
+        <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;
+                    color:#3D2B00;line-height:1">{_day}</div>
+        <div>
+          <div style="font-family:'Inter',sans-serif;font-size:.65rem;font-weight:700;
+                      color:#3D2B00;letter-spacing:.08em">{_month}</div>
+          <div style="font-family:'Space Mono',monospace;font-size:.55rem;
+                      color:rgba(61,43,0,0.45);letter-spacing:.06em">{_year}</div>
         </div>
-        <div style="font-family:'Space Mono',monospace;font-size:.6rem;font-weight:700;
-                    color:rgba(61,43,0,0.45);letter-spacing:.12em">SN</div>
       </div>
+      <div style="font-family:'Space Mono',monospace;font-size:.55rem;
+                  color:rgba(61,43,0,0.35);margin-top:.35rem;letter-spacing:.1em">{_time} · Dakar, SN</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1333,49 +1385,67 @@ if page == "dashboard":
     </div>
     """, unsafe_allow_html=True)
 
-    # ── Senegal Map + KPI intro ────────────────────────────────────────────────
-    map_col, kpi_intro_col = st.columns([1, 2], gap="large")
+    # ── Senegal Map Hero ───────────────────────────────────────────────────────
+    map_col, kpi_intro_col = st.columns([5, 3], gap="large")
     with map_col:
         st.markdown(f"""
-<div class="map-card">
-  <div class="map-title">Sénégal · Web Coverage</div>
-  <img src="{_SN_MAP_SRC}" class="sn-map" alt="Carte du Sénégal" />
-  <div class="map-legend">
-    <span class="map-dot"></span> Sites surveillés · 5 régions
+<div class="map-card map-card--hero">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+    <div class="map-title" style="margin:0">Sénégal · Web Coverage</div>
+    <div style="font-family:'Space Mono',monospace;font-size:.55rem;color:rgba(61,43,0,0.4);
+                letter-spacing:.15em;text-transform:uppercase">RÉSEAU · {n_sites} SITES</div>
+  </div>
+  <img src="{_SN_MAP_SRC}" class="sn-map" alt="Carte du Sénégal"
+       style="width:100%;max-width:none;border-radius:10px;
+              box-shadow:0 8px 32px rgba(201,168,76,0.18);" />
+  <div class="map-legend" style="margin-top:1rem">
+    <span class="map-dot"></span> Sites surveillés · 5 régions — Presse · E-commerce · Télécoms · Finance · Emploi
   </div>
 </div>
 """, unsafe_allow_html=True)
     with kpi_intro_col:
-        st.markdown("""
-<div style="padding:1.5rem 0 .5rem">
-  <div style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;
-              color:#1A1A2E;line-height:1.3;margin-bottom:.75rem">
+        st.markdown(f"""
+<div style="padding:1rem 0 .5rem;height:100%;display:flex;flex-direction:column;justify-content:center">
+  <div style="font-family:'Inter',sans-serif;font-size:.5rem;font-weight:700;
+              letter-spacing:.25em;text-transform:uppercase;color:#C9A84C;margin-bottom:.75rem">
+    Observatoire National
+  </div>
+  <div style="font-family:'Playfair Display',serif;font-size:1.75rem;font-weight:700;
+              color:#1A1A2E;line-height:1.25;margin-bottom:1rem">
     Tableau de bord<br><span style="color:#C9A84C">en temps réel</span>
   </div>
-  <div style="font-family:Inter,sans-serif;font-size:.8rem;color:#6B7280;line-height:1.7;
-              max-width:380px">
-    Surveillance continue de l'écosystème web sénégalais —
-    presse, e-commerce, télécoms, finance et emploi.
-    Données actualisées quotidiennement via crawl automatisé.
+  <div style="font-family:Inter,sans-serif;font-size:.8rem;color:#6B7280;line-height:1.75;
+              border-left:2px solid rgba(201,168,76,0.3);padding-left:1rem;margin-bottom:1.5rem">
+    Surveillance continue de l'écosystème web sénégalais — presse, e-commerce,
+    télécoms, finance et emploi. Données actualisées quotidiennement.
   </div>
-  <div style="display:flex;gap:1.5rem;margin-top:1.25rem;flex-wrap:wrap">
-    <div style="text-align:center">
-      <div style="font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;color:#C9A84C">5</div>
-      <div style="font-family:Inter,sans-serif;font-size:.6rem;color:#9CA3AF;text-transform:uppercase;letter-spacing:.08em">Secteurs</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem">
+    <div style="background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(240,208,128,0.04));
+                border:1px solid rgba(201,168,76,0.15);border-radius:10px;
+                padding:.9rem .75rem;text-align:center">
+      <div style="font-family:'Space Mono',monospace;font-size:1.5rem;font-weight:700;color:#C9A84C">{n_sites}</div>
+      <div style="font-family:Inter,sans-serif;font-size:.5rem;color:#9CA3AF;
+                  text-transform:uppercase;letter-spacing:.1em;margin-top:.2rem">Sites</div>
     </div>
-    <div style="text-align:center">
-      <div style="font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;color:#C9A84C">24/7</div>
-      <div style="font-family:Inter,sans-serif;font-size:.6rem;color:#9CA3AF;text-transform:uppercase;letter-spacing:.08em">Monitoring</div>
+    <div style="background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(240,208,128,0.04));
+                border:1px solid rgba(201,168,76,0.15);border-radius:10px;
+                padding:.9rem .75rem;text-align:center">
+      <div style="font-family:'Space Mono',monospace;font-size:1.5rem;font-weight:700;color:#C9A84C">5</div>
+      <div style="font-family:Inter,sans-serif;font-size:.5rem;color:#9CA3AF;
+                  text-transform:uppercase;letter-spacing:.1em;margin-top:.2rem">Secteurs</div>
     </div>
-    <div style="text-align:center">
-      <div style="font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;color:#C9A84C">100</div>
-      <div style="font-family:Inter,sans-serif;font-size:.6rem;color:#9CA3AF;text-transform:uppercase;letter-spacing:.08em">Pts score</div>
+    <div style="background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(240,208,128,0.04));
+                border:1px solid rgba(201,168,76,0.15);border-radius:10px;
+                padding:.9rem .75rem;text-align:center">
+      <div style="font-family:'Space Mono',monospace;font-size:1.5rem;font-weight:700;color:#C9A84C">24/7</div>
+      <div style="font-family:Inter,sans-serif;font-size:.5rem;color:#9CA3AF;
+                  text-transform:uppercase;letter-spacing:.1em;margin-top:.2rem">Live</div>
     </div>
   </div>
 </div>
 """, unsafe_allow_html=True)
 
-    st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:1.5rem'></div>", unsafe_allow_html=True)
 
     # KPI row
     k1, k2, k3, k4, k5 = st.columns(5, gap="medium")
@@ -2211,7 +2281,7 @@ elif page == "export":
             st.markdown("""
             <div class="crd" style="padding:1.4rem 1.6rem;min-height:120px">
               <div style="font-family:Inter,sans-serif;font-size:.625rem;font-weight:700;
-                          color:#10B981;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.5rem">
+                          color:#C9A84C;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.5rem">
                 CSV · Scores complets
               </div>
               <div style="font-size:.8125rem;color:#4B5563;line-height:1.65">
@@ -2233,7 +2303,7 @@ elif page == "export":
             st.markdown("""
             <div class="crd" style="padding:1.4rem 1.6rem;min-height:120px">
               <div style="font-family:Inter,sans-serif;font-size:.625rem;font-weight:700;
-                          color:#0EA5E9;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.5rem">
+                          color:#C9A84C;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.5rem">
                 JSON · API-ready
               </div>
               <div style="font-size:.8125rem;color:#4B5563;line-height:1.65">
@@ -2253,7 +2323,7 @@ elif page == "export":
             st.markdown("""
             <div class="crd" style="padding:1.4rem 1.6rem;min-height:120px">
               <div style="font-family:Inter,sans-serif;font-size:.625rem;font-weight:700;
-                          color:#8B5CF6;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.5rem">
+                          color:#C9A84C;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.5rem">
                 HTML · Rapport executif
               </div>
               <div style="font-size:.8125rem;color:#4B5563;line-height:1.65">
