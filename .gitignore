@@ -1,0 +1,19 @@
+# Secrets — ne jamais committer
+.streamlit/secrets.toml
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environnements virtuels
+venv/
+.venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
