@@ -163,20 +163,28 @@ html,body {
   font-family:'Inter',sans-serif !important;
   color:var(--text) !important;
 }
-[data-testid="stMain"] {
+section[data-testid="stMain"] {
   background: transparent !important;
   padding-top: 56px !important;
+  margin-top: 0 !important;
+}
+section[data-testid="stMain"] > div,
+section[data-testid="stMain"] > div > div {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
 }
 .block-container {
-  padding:0 !important; margin-top:0 !important; max-width:100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: 100% !important;
 }
-section[data-testid="stMain"] > div:first-child {
-  padding-top:0 !important; margin-top:0 !important;
-}
-[data-testid="stVerticalBlock"] { gap:0.5rem !important; }
+[data-testid="stVerticalBlock"] { gap: 0 !important; }
 div[data-testid="element-container"] {
-  margin:0 !important; padding:0 !important; min-height:0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
 }
+div[data-testid="element-container"]:empty { display:none !important; }
 
 /* ═══════════════════════════════════════
    SIDEBAR — DARK GLASSMORPHISM
@@ -1886,7 +1894,7 @@ if _search_q and not df_f.empty:
     # Bannière résultats
     _sr_count = len(df_f)
     st.markdown(
-    f'<div class="search-banner mwrap" style="padding:0 2.5rem;margin-top:56px">'
+    f'<div class="search-banner mwrap" style="padding:0 2.5rem">'
     f'<span class="sb-query">"{_search_q}"</span>'
     f'<span class="sb-count">— {_sr_count} site{"s" if _sr_count!=1 else ""} trouvé{"s" if _sr_count!=1 else ""}</span>'
     f'<a href="?" class="sb-clear">Effacer la recherche ×</a>'
