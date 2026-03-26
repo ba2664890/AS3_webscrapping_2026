@@ -9,6 +9,7 @@ Commandes disponibles :
   python main.py backlinks     Collecter pages indexées CommonCrawl (gratuit)
   python main.py trends        Collecter Google Trends — popularité réelle (gratuit)
   python main.py pagerank      Collecter Open PageRank (gratuit, clé requise)
+  python main.py refdomains    Collecter domaines référents via Majestic (gratuit, clé requise)
   python main.py full          Collecte complète dans l'ordre logique
   python main.py status        Rapport de couverture des données
 """
@@ -63,6 +64,11 @@ def cmd_trends(category=None):
 def cmd_pagerank():
     from data_collection.apis.openpagerank_client import collect_all_pagerank
     collect_all_pagerank()
+
+
+def cmd_refdomains():
+    from data_collection.apis.majestic_client import collect_all_referring_domains
+    collect_all_referring_domains()
 
 
 def cmd_status():
@@ -171,6 +177,8 @@ def cmd_full():
 
     print("\nOpen PageRank (optionnel) :")
     print("  Ajouter OPENPAGERANK_API_KEY dans .env puis lancer : python main.py pagerank")
+    print("\nDomaines référents Majestic (optionnel) :")
+    print("  Ajouter MAJESTIC_API_KEY dans .env puis lancer : python main.py refdomains")
 
     print("\nCollecte complète terminée.")
     cmd_status()
@@ -183,7 +191,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "command",
-        choices=["init", "crawl", "perf", "backlinks", "trends", "pagerank", "full", "status"]
+        choices=["init", "crawl", "perf", "backlinks", "trends", "pagerank", "refdomains", "full", "status"]
     )
     parser.add_argument("--cat",      type=str, help="Filtrer par catégorie")
     parser.add_argument("--strategy", choices=["mobile", "desktop"], default="mobile")
@@ -195,8 +203,9 @@ if __name__ == "__main__":
         "perf":      lambda: cmd_perf(strategy=args.strategy),
         "backlinks": cmd_backlinks,
         "trends":    lambda: cmd_trends(category=args.cat),
-        "pagerank":  cmd_pagerank,
-        "full":      cmd_full,
+        "pagerank":   cmd_pagerank,
+        "refdomains": cmd_refdomains,
+        "full":       cmd_full,
         "status":    cmd_status,
     }
     cmds[args.command]()

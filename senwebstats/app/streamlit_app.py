@@ -3036,25 +3036,25 @@ td{{padding:.55rem .7rem;border-bottom:1px solid #e5e7eb;color:#111827}}
 # ══════════════════════════════════════════════════════════════════════════════
 elif page == "assistant":
     try:
-        from groq import Groq as _Groq
-        _GROQ_OK = True
+        from huggingface_hub import InferenceClient as _HFClient
+        _HF_OK = True
     except ImportError:
-        _GROQ_OK = False
+        _HF_OK = False
 
     # ── Garde-fous AVANT l'ouverture du mwrap ──────────────────────────────────
-    if not _GROQ_OK:
+    if not _HF_OK:
         st.markdown(
             '<div class="mwrap"><div class="ibox" style="margin-top:2rem">'
-            'Module <code>groq</code> manquant — lance : '
-            '<code>pip install groq</code></div></div>',
+            'Module <code>huggingface_hub</code> manquant — lance : '
+            '<code>pip install huggingface-hub</code></div></div>',
             unsafe_allow_html=True)
         st.stop()
 
-    _api_key = os.environ.get("GROQ_API_KEY", "")
+    _api_key = os.environ.get("HF_TOKEN", "")
     if not _api_key:
         st.markdown(
             '<div class="mwrap"><div class="ibox" style="margin-top:2rem">'
-            'Variable <code>GROQ_API_KEY</code> manquante dans <code>.env</code>.'
+            'Variable <code>HF_TOKEN</code> manquante dans <code>.env</code> ou Secrets.'
             '</div></div>',
             unsafe_allow_html=True)
         st.stop()
@@ -3111,14 +3111,15 @@ elif page == "assistant":
 </style>""", unsafe_allow_html=True)
 
     # ── Vérification clé API ────────────────────────────────────────────────────
+    _HF_MODEL = "mistralai/Mistral-7B-Instruct-v0.2"
+
     @st.cache_data(ttl=120)
     def _check_api(key: str) -> tuple[bool, str]:
         try:
-            c = _Groq(api_key=key)
-            c.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+            c = _HFClient(model=_HF_MODEL, token=key)
+            c.chat_completion(
+                messages=[{"role": "user", "content": "ok"}],
                 max_tokens=5,
-                messages=[{"role": "user", "content": "ok"}]
             )
             return True, ""
         except Exception as e:
@@ -3128,8 +3129,8 @@ elif page == "assistant":
 
     if not _api_ok:
         st.warning(
-            f"**Erreur API Groq** : {_api_err}  \n"
-            "Vérifie ta clé sur **[console.groq.com](https://console.groq.com)**  \n\n"
+            f"**Erreur API Hugging Face** : {_api_err}  \n"
+            "Vérifie ton token sur **huggingface.co/settings/tokens**  \n\n"
             "Le mode analyse hors-ligne reste disponible ci-dessous.",
             icon=None
         )
@@ -3363,20 +3364,19 @@ Données du contexte ci-dessous (mises à jour en temps réel depuis la base) :
         if _api_ok:
             try:
                 ctx = _build_context()
-                client = _Groq(api_key=_api_key)
-                response = client.chat.completions.create(
-                    model="llama-3.3-70b-versatile",
-                    max_tokens=1024,
+                client = _HFClient(model=_HF_MODEL, token=_api_key)
+                response = client.chat_completion(
                     messages=[
                         {"role": "system", "content": SYSTEM_PROMPT + "\n\n" + ctx},
                     ] + [
                         {"role": m["role"], "content": m["content"]}
                         for m in st.session_state.chat_messages
                     ],
+                    max_tokens=1024,
                 )
                 return response.choices[0].message.content
             except Exception as e:
-                return (f"⚠️ Erreur API Groq : {e}\n\n---\n\n**Mode analyse :**\n\n"
+                return (f"⚠️ Erreur API Hugging Face : {e}\n\n---\n\n**Mode analyse :**\n\n"
                         + _analyse_hors_ligne(question))
         return _analyse_hors_ligne(question)
 
