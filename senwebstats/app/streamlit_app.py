@@ -2,7 +2,7 @@
 SenWebStats — Observatory v7 · Masterclass Design
 Dark sidebar · Premium KPIs · Treemap · Scatter · Donut · Radar · Violin
 """
-import sys, os, io, json, sqlite3
+import sys, os, io, json, sqlite3, base64
 from datetime import datetime
 
 sys.stdout.reconfigure(encoding="utf-8")
@@ -27,6 +27,18 @@ except Exception:
     _CTR_OK = False
     CATEGORY_BASE = {"presse":250000,"ecommerce":80000,"telephonie":120000,"banque_finance":60000,"emploi":40000}
     CATEGORY_LABELS = {"presse":"Presse & Medias","ecommerce":"E-commerce","telephonie":"Telephonie","banque_finance":"Banque & Finance","emploi":"Emploi"}
+
+# ── Senegal map image (base64) ──────────────────────────────────────────────
+def _load_img_b64(fname: str) -> str:
+    p = os.path.join(os.path.dirname(os.path.abspath(__file__)), fname)
+    if os.path.exists(p):
+        with open(p, "rb") as _f:
+            ext = fname.rsplit(".", 1)[-1].lower()
+            mime = "image/png" if ext == "png" else "image/jpeg"
+            return f"data:{mime};base64,{base64.b64encode(_f.read()).decode()}"
+    return ""
+
+_SN_MAP_SRC = _load_img_b64("senegal_map.png")
 
 st.set_page_config(
     page_title="SenWebStats · Observatory",
@@ -128,12 +140,12 @@ html,body {
 .block-container { padding:0 !important; max-width:100% !important; }
 
 /* ═══════════════════════════════════════
-   SIDEBAR — GOLD LIGHT PANEL
+   SIDEBAR — GOLD MAJESTIC PANEL
 ═══════════════════════════════════════ */
 [data-testid="stSidebar"] {
-  background: var(--sidebar-bg) !important;
-  border-right: 1px solid rgba(0,0,0,0.08) !important;
-  box-shadow: 4px 0 24px rgba(0,0,0,0.06) !important;
+  background: linear-gradient(160deg,#C9A84C 0%,#DFB84A 55%,#F0D080 100%) !important;
+  border-right: 1px solid rgba(61,43,0,0.18) !important;
+  box-shadow: 4px 0 32px rgba(139,105,20,0.25) !important;
   animation: fadeInLeft 0.4s ease both;
 }
 [data-testid="stSidebarContent"] { padding:0 !important; }
@@ -142,24 +154,24 @@ html,body {
 .brand-block {
   display:flex; align-items:center; gap:.75rem;
   padding:1.5rem 1.25rem 1.25rem;
-  border-bottom:1px solid rgba(0,0,0,0.06);
+  border-bottom:1px solid rgba(61,43,0,0.12);
   margin-bottom:.75rem;
 }
 .brand-icon {
-  width:42px; height:42px; background:var(--gold);
+  width:42px; height:42px; background:#3D2B00;
   border-radius:8px; display:flex; align-items:center;
-  justify-content:center; color:white; font-weight:900;
+  justify-content:center; color:#F0D080; font-weight:900;
   font-size:1.1rem; flex-shrink:0;
-  animation:pulse-glow 3s ease-in-out infinite;
+  box-shadow:0 4px 12px rgba(61,43,0,0.3);
 }
-.brand-name { font-weight:700; font-size:.95rem; color:var(--text); font-family:'Inter',sans-serif; }
-.brand-sub  { font-size:.55rem; letter-spacing:.15em; color:var(--text-sub);
+.brand-name { font-weight:700; font-size:.95rem; color:#3D2B00; font-family:'Inter',sans-serif; }
+.brand-sub  { font-size:.55rem; letter-spacing:.15em; color:rgba(61,43,0,0.6);
               text-transform:uppercase; font-family:'Inter',sans-serif; }
 
 /* Nav section label */
 .sb-section {
   font-family:'Inter',sans-serif; font-size:.5rem; font-weight:700;
-  color:rgba(26,26,46,0.3); letter-spacing:.22em; text-transform:uppercase;
+  color:rgba(61,43,0,0.45); letter-spacing:.22em; text-transform:uppercase;
   padding:.5rem 1.25rem .3rem;
 }
 
@@ -167,22 +179,22 @@ html,body {
 .nav-item {
   display:flex; align-items:center; gap:.75rem;
   padding:.7rem 1.25rem; font-size:.7rem; font-weight:600;
-  letter-spacing:.1em; color:var(--text-sub);
+  letter-spacing:.1em; color:rgba(61,43,0,0.65);
   text-transform:uppercase; font-family:'Inter',sans-serif;
   border-left:3px solid transparent;
 }
 .nav-item.active {
-  background:rgba(201,168,76,.12);
-  color:var(--gold-dark);
-  border-left-color:var(--gold);
+  background:rgba(61,43,0,0.15);
+  color:#3D2B00;
+  border-left-color:#3D2B00;
   font-weight:700;
 }
-.nav-icon { font-size:1rem; width:20px; text-align:center; }
+.nav-icon { font-size:.9rem; width:20px; text-align:center; font-style:normal; }
 
 /* Nav buttons (inactive) */
 [data-testid="stSidebar"] .stButton > button {
   background:transparent !important;
-  color:var(--text-sub) !important;
+  color:rgba(61,43,0,0.65) !important;
   border:none !important; border-radius:0 !important;
   border-left:3px solid transparent !important;
   text-align:left !important; justify-content:flex-start !important;
@@ -194,59 +206,62 @@ html,body {
   box-shadow:none !important; min-height:0 !important;
 }
 [data-testid="stSidebar"] .stButton > button:hover {
-  background:rgba(201,168,76,.07) !important;
-  color:var(--text) !important;
-  border-left-color:rgba(201,168,76,.4) !important;
+  background:rgba(255,255,255,0.25) !important;
+  color:#3D2B00 !important;
+  border-left-color:#3D2B00 !important;
   transform:none !important;
   box-shadow:none !important;
 }
 [data-testid="stSidebar"] .stButton > button:focus { box-shadow:none !important; }
 
-/* Keep CTA / export wraps but restyle gold */
+/* CTA / export wraps adapted to gold sidebar */
 .nav-cta-wrap .stButton > button {
-  background:linear-gradient(135deg,var(--gold),var(--gold-light)) !important;
-  color:#fff !important; border:none !important;
+  background:rgba(61,43,0,0.18) !important;
+  color:#3D2B00 !important;
+  border:1.5px solid rgba(61,43,0,0.25) !important;
   border-radius:10px !important; font-weight:700 !important;
-  box-shadow:0 4px 14px rgba(201,168,76,.3) !important;
+  box-shadow:none !important;
   letter-spacing:.06em !important;
 }
 .nav-cta-wrap .stButton > button:hover {
-  transform:translateY(-2px) !important;
-  box-shadow:0 8px 24px rgba(201,168,76,.4) !important;
+  background:rgba(61,43,0,0.28) !important;
+  border-color:rgba(61,43,0,0.4) !important;
+  transform:none !important;
+  box-shadow:none !important;
 }
 .nav-export-wrap .stButton > button {
-  background:rgba(201,168,76,.08) !important;
-  color:var(--gold-dark) !important;
-  border:1px solid rgba(201,168,76,.2) !important;
+  background:rgba(255,255,255,0.22) !important;
+  color:#3D2B00 !important;
+  border:1.5px solid rgba(61,43,0,0.18) !important;
   border-radius:10px !important; font-weight:600 !important;
   box-shadow:none !important;
 }
 .nav-export-wrap .stButton > button:hover {
-  background:rgba(201,168,76,.14) !important;
-  border-color:rgba(201,168,76,.35) !important;
+  background:rgba(255,255,255,0.35) !important;
+  border-color:rgba(61,43,0,0.3) !important;
   transform:none !important;
 }
 
 /* Sidebar divider */
 .sb-div {
   height:1px; margin:.75rem 1.25rem;
-  background:linear-gradient(90deg,transparent,rgba(201,168,76,.25),transparent);
+  background:linear-gradient(90deg,transparent,rgba(61,43,0,0.2),transparent);
 }
 
 /* Status badge */
 .sb-status {
   display:inline-flex; align-items:center; gap:7px;
   padding:5px 12px 5px 10px;
-  background:rgba(22,163,74,.07);
-  border:1px solid rgba(22,163,74,.22);
+  background:rgba(255,255,255,0.3);
+  border:1px solid rgba(61,43,0,0.2);
   border-radius:20px;
   font-family:'Inter',sans-serif; font-size:.5625rem;
-  font-weight:700; color:#16A34A; letter-spacing:.07em; text-transform:uppercase;
+  font-weight:700; color:#3D2B00; letter-spacing:.07em; text-transform:uppercase;
 }
 .sb-dot {
   width:7px; height:7px; border-radius:50%; flex-shrink:0;
-  background:#16A34A;
-  animation:pulse-glow 2.2s ease infinite;
+  background:#3D2B00;
+  animation:pulse-dot 2.2s ease infinite;
 }
 
 /* Sidebar selectbox */
@@ -607,20 +622,78 @@ html,body {
 .fab:hover::before { opacity:1; }
 
 /* ══════════════════════════════════════════════════════════
-   SITE FOOTER
+   SITE FOOTER — DARK GOLD MAJESTIC
 ══════════════════════════════════════════════════════════ */
 .site-footer {
-  background:var(--card); border-top:1px solid rgba(0,0,0,.07);
-  padding:2rem 3rem; margin-top:3rem;
-  display:flex; justify-content:space-between; align-items:center;
-  animation:fadeInUp .5s ease .6s both;
+  background: linear-gradient(135deg,#1A1200 0%,#2D2000 40%,#3D3215 70%,#1A1200 100%);
+  border-top: 2px solid #C9A84C;
+  padding: 2.5rem 3rem;
+  margin-top: 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp .5s ease .6s both;
 }
-.footer-brand { font-family:'Inter',sans-serif; font-size:1rem; font-weight:700; color:var(--text); }
-.footer-copy  { font-size:.75rem; color:var(--text-sub); margin-top:.25rem; }
-.footer-links { font-size:.8rem; color:var(--text-sub); display:flex; gap:1rem; align-items:center; }
-.footer-links a { color:var(--text-sub); text-decoration:none; }
-.footer-links a:hover { color:var(--gold); }
-.footer-links span { opacity:.3; }
+.site-footer::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg,transparent 0%,#F0D080 30%,#C9A84C 50%,#F0D080 70%,transparent 100%);
+}
+.site-footer::after {
+  content:'';
+  position:absolute; bottom:0; right:0;
+  width:280px; height:280px;
+  background: radial-gradient(circle,rgba(201,168,76,0.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.footer-brand {
+  font-family:'Playfair Display',serif;
+  font-size:1.15rem; font-weight:700;
+  color:#F0D080;
+  letter-spacing:.02em;
+}
+.footer-tagline {
+  font-family:'Inter',sans-serif;
+  font-size:.6rem; font-weight:500;
+  color:rgba(240,208,128,0.45);
+  letter-spacing:.2em; text-transform:uppercase;
+  margin-top:.35rem;
+}
+.footer-copy {
+  font-size:.7rem;
+  color:rgba(240,208,128,0.4);
+  margin-top:.25rem;
+  font-family:'Inter',sans-serif;
+}
+.footer-divider {
+  width:1px; height:40px;
+  background:linear-gradient(180deg,transparent,rgba(201,168,76,0.3),transparent);
+}
+.footer-links {
+  font-size:.75rem;
+  color:rgba(240,208,128,0.55);
+  display:flex; gap:1.25rem; align-items:center;
+  font-family:'Inter',sans-serif;
+}
+.footer-links a {
+  color:rgba(240,208,128,0.55);
+  text-decoration:none;
+  letter-spacing:.04em;
+  transition:color .2s;
+}
+.footer-links a:hover { color:#F0D080; }
+.footer-links .sep { color:rgba(201,168,76,0.25); }
+.footer-badge {
+  font-family:'Space Mono',monospace;
+  font-size:.55rem; letter-spacing:.18em;
+  color:rgba(201,168,76,0.4);
+  text-transform:uppercase;
+  border:1px solid rgba(201,168,76,0.15);
+  border-radius:4px; padding:.25rem .6rem;
+  margin-top:.5rem; display:inline-block;
+}
 
 /* ══════════════════════════════════════════════════════════
    SENEGAL MAP CARD
@@ -1138,13 +1211,13 @@ with st.sidebar:
 
     # ── MAIN NAV ───────────────────────────────────────────────────────────────
     MAIN_NAV = [
-        ("dashboard", "⊞",  "Dashboard"),
-        ("scoring",   "📊", "Scoring & Trafic"),
-        ("meta",      "🗂", "Métadonnées"),
-        ("perf",      "⚡", "Performance"),
-        ("backlinks", "🔗", "Backlinks"),
-        ("compare",   "⚖", "Comparaison"),
-        ("assistant", "🤖", "Assistant IA"),
+        ("dashboard", "◈",  "Dashboard"),
+        ("scoring",   "▸",  "Scoring & Trafic"),
+        ("meta",      "◉",  "Metadonnees"),
+        ("perf",      "◆",  "Performance"),
+        ("backlinks", "⊕",  "Backlinks"),
+        ("compare",   "⊞",  "Comparaison"),
+        ("assistant", "◎",  "Assistant IA"),
     ]
     for pid, icon, label in MAIN_NAV:
         if st.session_state.page == pid:
@@ -1162,19 +1235,19 @@ with st.sidebar:
     st.markdown('<div class="sb-div"></div><div class="sb-section">Analytics</div>', unsafe_allow_html=True)
 
     if st.session_state.page == "veille":
-        st.markdown('<div class="nav-item active"><span class="nav-icon">📡</span>Veille &amp; Tendances</div>', unsafe_allow_html=True)
+        st.markdown('<div class="nav-item active"><span class="nav-icon">◎</span>Veille &amp; Tendances</div>', unsafe_allow_html=True)
     else:
         st.markdown('<div class="nav-cta-wrap">', unsafe_allow_html=True)
-        if st.button("📡  Veille & Tendances", key="nav_veille", use_container_width=True):
+        if st.button("◎  Veille & Tendances", key="nav_veille", use_container_width=True):
             st.session_state.page = "veille"
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
     if st.session_state.page == "export":
-        st.markdown('<div class="nav-item active"><span class="nav-icon">📄</span>Rapports &amp; Export</div>', unsafe_allow_html=True)
+        st.markdown('<div class="nav-item active"><span class="nav-icon">↑</span>Rapports &amp; Export</div>', unsafe_allow_html=True)
     else:
         st.markdown('<div class="nav-export-wrap">', unsafe_allow_html=True)
-        if st.button("📄  Rapports & Export", key="nav_export", use_container_width=True):
+        if st.button("↑  Rapports & Export", key="nav_export", use_container_width=True):
             st.session_state.page = "export"
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
@@ -1188,24 +1261,38 @@ with st.sidebar:
     # ── SIDEBAR FOOTER ──────────────────────────────────────────────────────────
     st.markdown(f"""
     <div style="position:absolute;bottom:0;left:0;right:0;padding:1rem 1.25rem;
-                border-top:1px solid rgba(201,168,76,.1);
-                background:rgba(249,244,232,.6)">
+                border-top:1px solid rgba(61,43,0,0.15);
+                background:rgba(61,43,0,0.08)">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div style="font-family:Inter,sans-serif;font-size:.5rem;font-weight:500;
-                    color:rgba(26,26,46,.4);line-height:1.9;letter-spacing:.03em">
+                    color:rgba(61,43,0,0.5);line-height:1.9;letter-spacing:.03em">
           5 secteurs · Sénégal<br>
-          <span style="color:rgba(26,26,46,.3)">{now}</span>
+          <span style="color:rgba(61,43,0,0.35)">{now}</span>
         </div>
-        <span style="font-size:.85rem">🇸🇳</span>
+        <div style="font-family:'Space Mono',monospace;font-size:.6rem;font-weight:700;
+                    color:rgba(61,43,0,0.45);letter-spacing:.12em">SN</div>
       </div>
     </div>
     """, unsafe_allow_html=True)
 
+# ── FAB — query_params navigation ─────────────────────────────────────────────
+_fab = st.query_params.get("fab", "")
+if _fab in ("assistant", "export"):
+    st.session_state.page = _fab
+    st.query_params.clear()
+    st.rerun()
+
 # ── FAB FLOATING ACTION BUTTONS ───────────────────────────────────────────────
 st.markdown("""
 <div class="fab-wrap">
-  <div class="fab fab-ia" data-tooltip="Assistant IA" onclick="window.location.href='?page=assistant'">✦</div>
-  <div class="fab fab-data" data-tooltip="Analytics">▦</div>
+  <a href="?fab=assistant" class="fab fab-ia" data-tooltip="Assistant IA"
+     style="text-decoration:none;display:flex;align-items:center;justify-content:center">
+    <span style="font-family:'Space Mono',monospace;font-weight:700;font-size:.75rem;color:#fff;letter-spacing:.05em">IA</span>
+  </a>
+  <a href="?fab=export" class="fab fab-data" data-tooltip="Rapports &amp; Export"
+     style="text-decoration:none;display:flex;align-items:center;justify-content:center">
+    <span style="font-family:'Space Mono',monospace;font-weight:700;font-size:.65rem;color:#C9A84C;letter-spacing:.03em">AN</span>
+  </a>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1249,76 +1336,10 @@ if page == "dashboard":
     # ── Senegal Map + KPI intro ────────────────────────────────────────────────
     map_col, kpi_intro_col = st.columns([1, 2], gap="large")
     with map_col:
-        st.markdown("""
+        st.markdown(f"""
 <div class="map-card">
   <div class="map-title">Sénégal · Web Coverage</div>
-  <svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg" class="sn-map">
-    <defs>
-      <linearGradient id="gld" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style="stop-color:#C9A84C;stop-opacity:1"/>
-        <stop offset="100%" style="stop-color:#F0D080;stop-opacity:1"/>
-      </linearGradient>
-      <linearGradient id="gld2" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style="stop-color:#8B6914;stop-opacity:1"/>
-        <stop offset="100%" style="stop-color:#C9A84C;stop-opacity:1"/>
-      </linearGradient>
-      <filter id="glow">
-        <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
-        <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-      <radialGradient id="ping-grad" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" style="stop-color:#C9A84C;stop-opacity:0.8"/>
-        <stop offset="100%" style="stop-color:#C9A84C;stop-opacity:0"/>
-      </radialGradient>
-    </defs>
-    <!-- Low-poly Senegal outline approximation -->
-    <polygon points="28,80 55,55 90,48 130,42 170,38 210,44 240,52 258,68 265,90 260,118 248,140 230,158 205,172 178,185 150,192 118,195 88,188 62,172 42,152 28,128 20,104"
-             fill="url(#gld)" fill-opacity="0.15" stroke="url(#gld)" stroke-width="1.5" filter="url(#glow)"/>
-    <!-- Interior poly cells (low-poly facets) -->
-    <polygon points="28,80 55,55 90,48 70,90 45,105" fill="url(#gld2)" fill-opacity="0.22" stroke="#C9A84C" stroke-width="0.6"/>
-    <polygon points="55,55 130,42 110,80 90,48" fill="url(#gld)" fill-opacity="0.18" stroke="#C9A84C" stroke-width="0.6"/>
-    <polygon points="130,42 210,44 190,75 150,78 110,80" fill="url(#gld2)" fill-opacity="0.14" stroke="#C9A84C" stroke-width="0.6"/>
-    <polygon points="210,44 258,68 240,95 210,85 190,75" fill="url(#gld)" fill-opacity="0.20" stroke="#C9A84C" stroke-width="0.6"/>
-    <polygon points="45,105 70,90 110,80 95,128 62,130" fill="url(#gld)" fill-opacity="0.16" stroke="#C9A84C" stroke-width="0.6"/>
-    <polygon points="110,80 150,78 160,118 130,132 95,128" fill="url(#gld2)" fill-opacity="0.24" stroke="#C9A84C" stroke-width="0.6"/>
-    <polygon points="150,78 190,75 210,85 205,118 175,122 160,118" fill="url(#gld)" fill-opacity="0.18" stroke="#C9A84C" stroke-width="0.6"/>
-    <polygon points="210,85 240,95 248,140 225,148 205,118" fill="url(#gld2)" fill-opacity="0.20" stroke="#C9A84C" stroke-width="0.6"/>
-    <polygon points="62,130 95,128 88,165 62,172 42,152" fill="url(#gld)" fill-opacity="0.14" stroke="#C9A84C" stroke-width="0.6"/>
-    <polygon points="95,128 130,132 128,168 100,178 88,165" fill="url(#gld2)" fill-opacity="0.18" stroke="#C9A84C" stroke-width="0.6"/>
-    <polygon points="130,132 160,118 175,122 168,162 148,172 128,168" fill="url(#gld)" fill-opacity="0.22" stroke="#C9A84C" stroke-width="0.6"/>
-    <polygon points="175,122 205,118 225,148 205,172 178,185 168,162" fill="url(#gld2)" fill-opacity="0.16" stroke="#C9A84C" stroke-width="0.6"/>
-    <!-- City nodes (presse, ecom, telecom, finance, emploi) -->
-    <!-- Dakar -->
-    <circle class="map-ping" cx="38" cy="132" r="14" fill="url(#ping-grad)"/>
-    <circle cx="38" cy="132" r="5" fill="#C9A84C" filter="url(#glow)"/>
-    <circle cx="38" cy="132" r="3" fill="#fff"/>
-    <text x="46" y="128" font-family="Inter,sans-serif" font-size="7" fill="#8B6914" font-weight="600">Dakar</text>
-    <!-- Thiès -->
-    <circle class="map-ping" cx="82" cy="118" r="10" fill="url(#ping-grad)" style="animation-delay:.4s"/>
-    <circle cx="82" cy="118" r="4" fill="#C9A84C" filter="url(#glow)"/>
-    <circle cx="82" cy="118" r="2.2" fill="#fff"/>
-    <text x="90" y="115" font-family="Inter,sans-serif" font-size="6" fill="#8B6914">Thiès</text>
-    <!-- Saint-Louis -->
-    <circle class="map-ping" cx="105" cy="58" r="9" fill="url(#ping-grad)" style="animation-delay:.8s"/>
-    <circle cx="105" cy="58" r="3.5" fill="#C9A84C" filter="url(#glow)"/>
-    <circle cx="105" cy="58" r="2" fill="#fff"/>
-    <text x="112" y="55" font-family="Inter,sans-serif" font-size="6" fill="#8B6914">St-Louis</text>
-    <!-- Ziguinchor -->
-    <circle class="map-ping" cx="88" cy="175" r="9" fill="url(#ping-grad)" style="animation-delay:1.2s"/>
-    <circle cx="88" cy="175" r="3.5" fill="#C9A84C" filter="url(#glow)"/>
-    <circle cx="88" cy="175" r="2" fill="#fff"/>
-    <text x="96" y="172" font-family="Inter,sans-serif" font-size="6" fill="#8B6914">Ziguinchor</text>
-    <!-- Touba -->
-    <circle class="map-ping" cx="148" cy="95" r="9" fill="url(#ping-grad)" style="animation-delay:1.6s"/>
-    <circle cx="148" cy="95" r="3.5" fill="#C9A84C" filter="url(#glow)"/>
-    <circle cx="148" cy="95" r="2" fill="#fff"/>
-    <text x="155" y="92" font-family="Inter,sans-serif" font-size="6" fill="#8B6914">Touba</text>
-    <!-- Connection lines -->
-    <line x1="38" y1="132" x2="82" y2="118" stroke="#C9A84C" stroke-width="0.8" stroke-opacity="0.35" stroke-dasharray="3,3"/>
-    <line x1="82" y1="118" x2="105" y2="58" stroke="#C9A84C" stroke-width="0.8" stroke-opacity="0.25" stroke-dasharray="3,3"/>
-    <line x1="82" y1="118" x2="148" y2="95" stroke="#C9A84C" stroke-width="0.8" stroke-opacity="0.25" stroke-dasharray="3,3"/>
-    <line x1="82" y1="118" x2="88" y2="175" stroke="#C9A84C" stroke-width="0.8" stroke-opacity="0.25" stroke-dasharray="3,3"/>
-  </svg>
+  <img src="{_SN_MAP_SRC}" class="sn-map" alt="Carte du Sénégal" />
   <div class="map-legend">
     <span class="map-dot"></span> Sites surveillés · 5 régions
   </div>
@@ -2368,42 +2389,110 @@ elif page == "assistant":
     st.markdown("""
     <style>
     /* Conteneur chat */
-    .chat-wrap {
-      max-width: 820px; margin: 0 auto;
-    }
+    .chat-wrap { max-width: 820px; margin: 0 auto; }
+
     /* Bulle utilisateur */
     [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
-      background: linear-gradient(135deg,rgba(14,165,233,0.08),rgba(99,102,241,0.05)) !important;
-      border-radius: 16px !important;
-      border: 1px solid rgba(99,102,241,0.10) !important;
+      background: #3D3215 !important;
+      border-radius: 16px 0 16px 16px !important;
+      border: none !important;
       margin-bottom: .75rem !important;
+      box-shadow: 0 2px 12px rgba(61,50,21,0.2) !important;
     }
+    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) p,
+    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) div {
+      color: #FFFFFF !important;
+    }
+
     /* Bulle assistant */
     [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) {
-      background: rgba(255,255,255,0.95) !important;
-      border-radius: 16px !important;
-      border: 1px solid rgba(99,102,241,0.08) !important;
-      box-shadow: 0 4px 20px rgba(99,102,241,0.07) !important;
+      background: #FFFFFF !important;
+      border-radius: 0 16px 16px 16px !important;
+      border: 1px solid rgba(201,168,76,0.2) !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
       margin-bottom: .75rem !important;
     }
-    /* Input */
-    [data-testid="stChatInput"] textarea {
-      background: rgba(255,255,255,0.97) !important;
-      border: 1.5px solid rgba(99,102,241,0.18) !important;
-      border-radius: 14px !important;
-      font-family: 'Inter', sans-serif !important;
-      font-size: .9rem !important;
-      box-shadow: 0 4px 20px rgba(99,102,241,0.08) !important;
+    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) p,
+    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) div {
+      color: #1A1A2E !important;
+      font-family: Inter, sans-serif !important;
+      font-size: 0.9rem !important;
     }
-    [data-testid="stChatInput"] textarea:focus {
-      border-color: rgba(14,165,233,0.40) !important;
-      box-shadow: 0 4px 24px rgba(14,165,233,0.14) !important;
+
+    /* Avatar assistant (icone IA) */
+    [data-testid="stChatMessageAvatarAssistant"] {
+      background: #C9A84C !important;
+      border-radius: 8px !important;
+      color: white !important;
+      font-weight: 700 !important;
+      font-size: 0.75rem !important;
+      font-family: 'Space Mono', monospace !important;
+    }
+
+    /* Avatar utilisateur */
+    [data-testid="stChatMessageAvatarUser"] {
+      background: #C9A84C !important;
+      border-radius: 50% !important;
+      color: white !important;
+      font-weight: 700 !important;
+      font-size: 0.8rem !important;
+    }
+
+    /* Zone messages */
+    [data-testid="stChatMessageContent"] {
+      background: transparent !important;
+    }
+
+    /* Input du chat */
+    [data-testid="stChatInput"] textarea,
+    [data-testid="stChatInputTextArea"] {
+      background: #FFFFFF !important;
+      border: 1.5px solid rgba(201,168,76,0.4) !important;
+      border-radius: 12px !important;
+      color: #1A1A2E !important;
+      font-family: Inter, sans-serif !important;
+      font-size: 0.9rem !important;
+      padding: 0.9rem 1.25rem !important;
+      box-shadow: 0 2px 12px rgba(201,168,76,0.08) !important;
+    }
+    [data-testid="stChatInput"] textarea:focus,
+    [data-testid="stChatInputTextArea"]:focus {
+      border-color: #C9A84C !important;
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.15) !important;
+      outline: none !important;
+    }
+    [data-testid="stChatInput"] textarea::placeholder {
+      color: #9CA3AF !important;
+      font-style: italic;
+    }
+
+    /* Bouton envoi */
+    [data-testid="stChatInputSubmitButton"] button {
+      background: #C9A84C !important;
+      border-radius: 8px !important;
+      color: white !important;
+      transition: all 0.2s ease !important;
+    }
+    [data-testid="stChatInputSubmitButton"] button:hover {
+      background: #8B6914 !important;
+      transform: scale(1.05) !important;
+    }
+
+    /* Zone de messages avec scroll */
+    .chat-area {
+      background: #F9F5EE;
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 16px;
+      padding: 1.5rem;
+      min-height: 400px;
+      max-height: 500px;
+      overflow-y: auto;
     }
     </style>
     """, unsafe_allow_html=True)
 
     if not _GROQ_OK:
-        st.markdown('<div class="ibox">📦 Module manquant — lance : <code>pip install groq</code></div>', unsafe_allow_html=True)
+        st.markdown('<div class="ibox">Module manquant — lance : <code>pip install groq</code></div>', unsafe_allow_html=True)
         st.stop()
 
     _api_key = os.environ.get("GROQ_API_KEY", "")
@@ -2432,7 +2521,7 @@ elif page == "assistant":
             f"**Erreur API Groq** : {_api_err}  \n"
             "Vérifie ta clé sur **[console.groq.com](https://console.groq.com)**  \n\n"
             "Le mode analyse hors-ligne reste disponible ci-dessous.",
-            icon="⚠️"
+            icon=None
         )
 
     # ── Mode hors-ligne : analyse directe des données ──────────────────────────
@@ -2649,7 +2738,7 @@ Données du contexte ci-dessous (mises à jour en temps réel depuis la base) :
     # ── Historique ──────────────────────────────────────────────────────────────
     st.markdown('<div class="chat-wrap">', unsafe_allow_html=True)
     for msg in st.session_state.chat_messages:
-        with st.chat_message(msg["role"], avatar="🧑" if msg["role"]=="user" else "🤖"):
+        with st.chat_message(msg["role"], avatar="S" if msg["role"]=="user" else "IA"):
             st.markdown(msg["content"])
 
     # ── Détection message en attente (via bouton suggestion) ────────────────────
@@ -2684,7 +2773,7 @@ Données du contexte ci-dessous (mises à jour en temps réel depuis la base) :
     # ── Traitement message en attente (suggestion cliquée) ──────────────────────
     if _pending:
         pending_q = st.session_state.chat_messages[-1]["content"]
-        with st.chat_message("assistant", avatar="🤖"):
+        with st.chat_message("assistant", avatar="IA"):
             with st.spinner("Analyse en cours…"):
                 answer = _generate_answer(pending_q)
             st.markdown(answer)
@@ -2697,10 +2786,10 @@ Données du contexte ci-dessous (mises à jour en temps réel depuis la base) :
 
     if user_input:
         st.session_state.chat_messages.append({"role": "user", "content": user_input})
-        with st.chat_message("user", avatar="🧑"):
+        with st.chat_message("user", avatar="S"):
             st.markdown(user_input)
 
-        with st.chat_message("assistant", avatar="🤖"):
+        with st.chat_message("assistant", avatar="IA"):
             with st.spinner("Analyse en cours…"):
                 answer = _generate_answer(user_input)
             st.markdown(answer)
@@ -2724,17 +2813,19 @@ Données du contexte ci-dessous (mises à jour en temps réel depuis la base) :
 st.markdown(f"""
 <div class="site-footer">
   <div>
-    <div class="footer-brand">✦ SenWebStats</div>
-    <div class="footer-copy">Observatoire National du Web Sénégalais · {now[:10]}</div>
+    <div class="footer-brand">SenWebStats</div>
+    <div class="footer-tagline">Observatoire National du Web Sénégalais</div>
+    <div class="footer-badge">v7 · {now[:10]}</div>
   </div>
+  <div class="footer-divider"></div>
   <div class="footer-links">
     <a href="#">Documentation</a>
-    <span>·</span>
+    <span class="sep">·</span>
     <a href="#">API</a>
-    <span>·</span>
+    <span class="sep">·</span>
     <a href="#">GitHub</a>
-    <span>·</span>
-    <span>Propulsé par 🇸🇳 data</span>
+    <span class="sep">·</span>
+    <span style="color:rgba(201,168,76,0.3);font-size:.7rem;font-family:'Space Mono',monospace">SN · DAKAR</span>
   </div>
 </div>
 """, unsafe_allow_html=True)
