@@ -165,6 +165,7 @@ html,body {
 }
 [data-testid="stMain"] {
   background: transparent !important;
+  padding-top: 56px !important;
 }
 .block-container {
   padding:0 !important; margin-top:0 !important; max-width:100% !important;
@@ -173,7 +174,9 @@ section[data-testid="stMain"] > div:first-child {
   padding-top:0 !important; margin-top:0 !important;
 }
 [data-testid="stVerticalBlock"] { gap:0.5rem !important; }
-div[data-testid="element-container"] { margin-top:0 !important; }
+div[data-testid="element-container"] {
+  margin:0 !important; padding:0 !important; min-height:0 !important;
+}
 
 /* ═══════════════════════════════════════
    SIDEBAR — DARK GLASSMORPHISM
@@ -336,7 +339,7 @@ div[data-testid="element-container"] { margin-top:0 !important; }
    MAIN CONTENT
 ═══════════════════════════════════════ */
 .mwrap {
-  padding:56px 2.5rem 6rem;
+  padding:1.5rem 2.5rem 6rem;
   background:rgba(255,255,255,0.82);
   backdrop-filter:blur(18px) saturate(160%);
   -webkit-backdrop-filter:blur(18px) saturate(160%);
@@ -3318,12 +3321,12 @@ Données du contexte ci-dessous (mises à jour en temps réel depuis la base) :
         """, unsafe_allow_html=True)
 
         suggestions = [
-            ("📊 Classement", "Quel est le top 5 des sites les mieux classés et pourquoi ?"),
-            ("⚡ Performance", "Quels sites ont les meilleures performances web (PageSpeed) ?"),
-            ("🔍 SEO", "Donne-moi une analyse SEO comparative par secteur"),
-            ("⚠️ Risques", "Quels sites sont en zone de risque technique et pourquoi ?"),
-            ("📈 Tendances", "Quels sites ont le plus d'intérêt de recherche au Sénégal ?"),
-            ("💡 Conseils", "Quelles sont les 3 recommandations prioritaires pour améliorer le web sénégalais ?"),
+            ("Classement", "Quel est le top 5 des sites les mieux classés et pourquoi ?"),
+            ("Performance", "Quels sites ont les meilleures performances web (PageSpeed) ?"),
+            ("SEO", "Donne-moi une analyse SEO comparative par secteur"),
+            ("Risques", "Quels sites sont en zone de risque technique et pourquoi ?"),
+            ("Tendances", "Quels sites ont le plus d'interet de recherche au Senegal ?"),
+            ("Conseils", "Quelles sont les 3 recommandations prioritaires pour ameliorer le web senegalais ?"),
         ]
         cols = st.columns(2, gap="medium")
         for i, (title, prompt) in enumerate(suggestions):
