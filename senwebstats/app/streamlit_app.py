@@ -159,7 +159,14 @@ html,body {
   font-family:'Inter',sans-serif !important;
   color:var(--text) !important;
 }
-.block-container { padding:0 !important; max-width:100% !important; }
+.block-container {
+  padding:0 !important; margin-top:0 !important; max-width:100% !important;
+}
+section[data-testid="stMain"] > div:first-child {
+  padding-top:0 !important; margin-top:0 !important;
+}
+[data-testid="stVerticalBlock"] { gap:0 !important; }
+div[data-testid="element-container"] { margin-top:0 !important; margin-bottom:0 !important; }
 
 /* ═══════════════════════════════════════
    SIDEBAR — GOLD MAJESTIC PANEL
@@ -319,7 +326,7 @@ html,body {
 /* ═══════════════════════════════════════
    MAIN CONTENT
 ═══════════════════════════════════════ */
-.mwrap { padding:calc(58px + 2rem) 2.5rem 6rem; background:transparent; }
+.mwrap { padding:56px 2.5rem 6rem; background:transparent; }
 
 /* ── ANIMATIONS ── */
 .anim-0 { animation:fadeInUp .5s ease .1s both; }
@@ -883,13 +890,16 @@ html,body {
   60%     { transform:rotate(-5deg); }
 }
 .pro-topbar {
-  position:fixed; top:0; left:21rem; right:0; height:58px; z-index:900;
-  background:rgba(255,255,255,0.97);
-  backdrop-filter:blur(14px) saturate(180%);
-  border-bottom:1px solid rgba(201,168,76,0.18);
-  box-shadow:0 2px 24px rgba(0,0,0,0.05);
+  position:fixed; top:0; left:21rem; right:0;
+  height:56px; min-height:56px; max-height:56px;
+  z-index:999;
+  background:#FFFFFF;
+  backdrop-filter:blur(12px) saturate(160%);
+  border-bottom:1px solid rgba(201,168,76,0.2);
+  box-shadow:0 1px 16px rgba(0,0,0,0.04);
   display:flex; align-items:center;
-  padding:0 2rem; gap:1.5rem;
+  padding:0 1.75rem; gap:1.25rem;
+  box-sizing:border-box;
 }
 .ptb-breadcrumb {
   display:flex; align-items:center; gap:.5rem; flex-shrink:0;
@@ -961,6 +971,98 @@ html,body {
   font-family:'Space Mono',monospace; font-weight:700;
   font-size:.58rem; color:#fff; letter-spacing:.05em;
   box-shadow:0 2px 8px rgba(201,168,76,0.35);
+}
+.ptb-bell-link { text-decoration:none; display:flex; align-items:center; justify-content:center; }
+.ptb-bell--active { background:rgba(201,168,76,0.14) !important; }
+
+/* Search active pill */
+.ptb-search-active {
+  display:inline-flex; align-items:center; gap:.4rem;
+  font-family:'Inter',sans-serif; font-size:.62rem; font-weight:600;
+  color:#8B6914; background:rgba(201,168,76,0.12);
+  border:1px solid rgba(201,168,76,0.3); border-radius:20px;
+  padding:.18rem .7rem; white-space:nowrap;
+}
+.ptb-search-clear {
+  font-size:.7rem; color:#8B6914; cursor:pointer; opacity:.7; text-decoration:none;
+}
+.ptb-search-clear:hover { opacity:1; }
+
+/* Search results banner */
+.search-banner {
+  display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;
+  padding:.6rem 1.25rem; margin-bottom:1rem;
+  background:linear-gradient(90deg,rgba(201,168,76,0.07),rgba(201,168,76,0.02));
+  border:1px solid rgba(201,168,76,0.18); border-radius:12px;
+  font-family:'Inter',sans-serif;
+}
+.sb-query { font-weight:700; color:#8B6914; font-size:.8rem; }
+.sb-count { font-size:.75rem; color:#6B7280; }
+.sb-clear {
+  margin-left:auto; font-size:.72rem; color:#C9A84C; font-weight:600;
+  text-decoration:none; border:1px solid rgba(201,168,76,0.3); border-radius:8px;
+  padding:.15rem .6rem; transition:all .2s;
+}
+.sb-clear:hover { background:rgba(201,168,76,0.12); color:#8B6914; }
+
+/* Glossary panel */
+@keyframes glossary-in {
+  from { opacity:0; transform:translateY(-8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.glossary-panel {
+  background:linear-gradient(145deg,#1A1200 0%,#2D2000 60%,#1A1200 100%);
+  border:1px solid rgba(201,168,76,0.22); border-radius:18px;
+  overflow:hidden; margin-bottom:1.5rem;
+  animation:glossary-in .3s ease both;
+  box-shadow:0 8px 40px rgba(0,0,0,0.18), 0 0 0 1px rgba(201,168,76,0.08);
+}
+.gp-shimmer {
+  height:2px;
+  background:linear-gradient(90deg,transparent,#8B6914,#C9A84C,#F0D080,#C9A84C,#8B6914,transparent);
+  background-size:200% 100%; animation:shimmer-bar 2s linear infinite;
+}
+.gp-inner { padding:1.5rem 2rem 2rem; }
+.gp-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:1.25rem;
+}
+.gp-title {
+  font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700;
+  color:#F0D080;
+}
+.gp-eyebrow {
+  font-family:'Inter',sans-serif; font-size:.5rem; font-weight:700;
+  letter-spacing:.25em; text-transform:uppercase; color:rgba(201,168,76,.5);
+  margin-bottom:.35rem;
+}
+.gp-close {
+  font-family:'Inter',sans-serif; font-size:.72rem; color:rgba(240,208,128,.55);
+  text-decoration:none; border:1px solid rgba(201,168,76,.2); border-radius:8px;
+  padding:.22rem .7rem; transition:all .2s;
+}
+.gp-close:hover { color:#F0D080; border-color:rgba(201,168,76,.45); background:rgba(201,168,76,.08); }
+.gp-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem;
+}
+.gp-term {
+  background:rgba(255,255,255,.04); border:1px solid rgba(201,168,76,.12);
+  border-radius:12px; padding:1rem 1.1rem; transition:border-color .2s,box-shadow .2s;
+}
+.gp-term:hover { border-color:rgba(201,168,76,.3); box-shadow:0 4px 18px rgba(201,168,76,.1); }
+.gp-term-name {
+  font-family:'Space Mono',monospace; font-size:.72rem; font-weight:700;
+  color:#F0D080; margin-bottom:.4rem; letter-spacing:.04em;
+}
+.gp-term-def {
+  font-family:'Inter',sans-serif; font-size:.73rem; color:rgba(255,255,255,.62);
+  line-height:1.6;
+}
+.gp-term-tag {
+  display:inline-block; margin-top:.5rem;
+  font-family:'Inter',sans-serif; font-size:.5rem; font-weight:700;
+  letter-spacing:.12em; text-transform:uppercase; color:rgba(201,168,76,.45);
+  background:rgba(201,168,76,.08); border-radius:5px; padding:.12rem .45rem;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -1588,8 +1690,11 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-# ── FAB — query_params navigation ─────────────────────────────────────────────
-_fab = st.query_params.get("fab", "")
+# ── FAB + Search + Panel — query_params ────────────────────────────────────────
+_fab      = st.query_params.get("fab",    "")
+_search_q = st.query_params.get("q",      "").strip().lower()
+_panel    = st.query_params.get("panel",  "").strip()
+
 if _fab in ("assistant", "export"):
     st.session_state.page = _fab
     st.query_params.clear()
@@ -1632,10 +1737,33 @@ _n_alerts  = int((df_all["score_global"] < 30).sum()) if "score_global" in df_al
 _page_lbl  = _PAGE_TITLES.get(page, page.replace("_"," ").capitalize())
 _tb_time   = datetime.now().strftime("%H:%M")
 _tb_date   = datetime.now().strftime("%d %b")
+
+# Badge cloche
 if _n_alerts > 0:
     _badge = f'<div class="ptb-badge">{_n_alerts}</div>'
 else:
     _badge = '<div class="ptb-badge ptb-badge--zero">0</div>'
+
+# Lien cloche : bascule glossaire (clic = affiche/masque)
+_glossary_href = "?" if _panel == "glossary" else "?panel=glossary"
+_bell_active   = ' ptb-bell--active' if _panel == "glossary" else ''
+
+# Valeur courante de la recherche dans l'input
+_search_val = _search_q.replace('"', '&quot;')
+
+# Indicateur recherche active dans la topbar
+if _search_q:
+    _nb_results = len(df_all[
+        df_all["name"].str.lower().str.contains(_search_q, na=False) |
+        df_all["url"].str.lower().str.contains(_search_q, na=False)  |
+        df_all["category"].str.lower().str.contains(_search_q, na=False)
+    ]) if "name" in df_all.columns else 0
+    _active_pill = (
+        f'<span class="ptb-search-active">{_nb_results} résultat{"s" if _nb_results!=1 else ""}'
+        f'<a href="?" class="ptb-search-clear" title="Effacer">&#x2715;</a></span>'
+    )
+else:
+    _active_pill = ""
 
 st.markdown(
 '<div class="pro-topbar">'
@@ -1644,14 +1772,27 @@ st.markdown(
 '<span class="ptb-sep"> / </span>'
 f'<span class="ptb-page">{_page_lbl}</span>'
 '</div>'
-'<div class="ptb-search-wrap">'
-'<svg class="ptb-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
-'<input class="ptb-search-input" type="text" placeholder="Rechercher un site, secteur ou indicateur…" />'
+f'<div class="ptb-search-wrap">'
+'<svg class="ptb-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"'
+' stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">'
+'<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
+f'<input class="ptb-search-input" type="text" value="{_search_val}"'
+' placeholder="Rechercher : site, secteur, indicateur…"'
+' onkeydown="if(event.key===\'Enter\'&&this.value.trim()){{'
+"var u=new URL(window.location);"
+"u.searchParams.set('q',this.value.trim());"
+"u.searchParams.delete('panel');"
+"window.location.href=u.toString();}}" />'
+f'{_active_pill}'
 '</div>'
 '<div class="ptb-actions">'
-f'<div class="ptb-bell"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7B6030" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>{_badge}</div>'
+f'<a href="{_glossary_href}" class="ptb-bell ptb-bell-link{_bell_active}" title="Glossaire des termes techniques">'
+f'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7B6030" stroke-width="2"'
+' stroke-linecap="round" stroke-linejoin="round">'
+'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>'
+f'<path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>{_badge}</a>'
 '<div class="ptb-divider"></div>'
-f'<div class="ptb-refresh"><div class="ptb-refresh-dot"></div>Mis a jour {_tb_date} · {_tb_time}</div>'
+f'<div class="ptb-refresh"><div class="ptb-refresh-dot"></div>Mis à jour {_tb_date} · {_tb_time}</div>'
 '<div class="ptb-divider"></div>'
 '<div class="ptb-avatar">SN</div>'
 '</div>'
@@ -1659,8 +1800,69 @@ f'<div class="ptb-refresh"><div class="ptb-refresh-dot"></div>Mis a jour {_tb_da
 unsafe_allow_html=True
 )
 
+# ── GLOSSAIRE (cloche) ──────────────────────────────────────────────────────────
+if _panel == "glossary":
+    _GLOSSARY = [
+        ("SSL / HTTPS",       "Protocole de sécurité chiffrant les échanges entre le navigateur et le serveur. Un site sans HTTPS est pénalisé par Google.", "Sécurité"),
+        ("Sitemap XML",       "Fichier listant toutes les URLs d'un site pour faciliter leur découverte et indexation par les robots des moteurs de recherche.", "SEO technique"),
+        ("Domaines référents","Nombre de domaines uniques pointant vers le site via des backlinks. Indicateur clé de l'autorité et de la crédibilité du domaine.", "Autorité"),
+        ("PageRank / DA",     "Score d'autorité de domaine (0–100) calculé selon la qualité et la quantité des liens entrants. Plus le score est élevé, mieux c'est.", "Autorité"),
+        ("LCP",               "Largest Contentful Paint — temps avant l'affichage du plus grand élément visible. Objectif : < 2,5 s. Indicateur Core Web Vitals.", "Performance"),
+        ("FCP",               "First Contentful Paint — temps avant le premier rendu de contenu (texte ou image). Objectif : < 1,8 s.", "Performance"),
+        ("TTFB",              "Time To First Byte — délai entre la requête HTTP et le premier octet reçu du serveur. Objectif : < 800 ms. Indique la réactivité serveur.", "Performance"),
+        ("CLS",               "Cumulative Layout Shift — mesure les décalages visuels inattendus lors du chargement. Objectif : < 0,1. Impacte l'expérience utilisateur.", "Performance"),
+        ("Score Global",      "Moyenne pondérée : Autorité 30 % + Qualité 25 % + Technique 25 % + Performance 20 %. Score sur 100, seuil critique < 30.", "Scoring"),
+        ("Score Autorité",    "Basé sur le Domain Authority (OpenPageRank) et le nombre de backlinks. Reflète la confiance accordée au domaine par les autres sites.", "Scoring"),
+        ("Score Technique",   "Évalue la vitesse de réponse, l'optimisation mobile, la présence du sitemap et du SSL. Base technique du référencement.", "Scoring"),
+        ("Score Qualité",     "Analyse la richesse du contenu (nombre de mots, balises meta title/description, structure H1). Mesure la pertinence éditoriale.", "Scoring"),
+        ("Trafic / mois",     "Estimation du trafic organique mensuel, calculée via le CTR moyen de la catégorie et le volume de recherche de référence.", "Audience"),
+        ("Pages indexées",    "Nombre de pages du site référencées dans l'index Google. Un site bien structuré maximise ses pages indexées.", "SEO"),
+        ("Robots.txt",        "Fichier indiquant aux robots d'exploration les pages autorisées ou interdites à l'indexation. Absence = mauvaise pratique.", "SEO technique"),
+        ("Score < 30",        "Site en zone critique (rouge). Recommande une intervention urgente : audit technique, contenu, liens entrants, performances.", "Scoring"),
+    ]
+    _terms_html = "".join(
+        f'<div class="gp-term">'
+        f'<div class="gp-term-name">{t[0]}</div>'
+        f'<div class="gp-term-def">{t[1]}</div>'
+        f'<span class="gp-term-tag">{t[2]}</span>'
+        f'</div>'
+        for t in _GLOSSARY
+    )
+    st.markdown(
+    '<div class="glossary-panel">'
+    '<div class="gp-shimmer"></div>'
+    '<div class="gp-inner">'
+    '<div class="gp-header">'
+    '<div><div class="gp-eyebrow">Observatoire · Terminologie</div>'
+    '<div class="gp-title">Glossaire des indicateurs web</div></div>'
+    '<a href="?" class="gp-close">Fermer ×</a>'
+    '</div>'
+    f'<div class="gp-grid">{_terms_html}</div>'
+    '</div></div>',
+    unsafe_allow_html=True
+    )
+
 df_f    = df_all if cat_f == "Tous secteurs" else df_all[df_all["category"] == cat_f]
 cat_sql = "" if cat_f == "Tous secteurs" else f"AND s.category = '{cat_f}'"
+
+# ── Filtre recherche (topbar search) ───────────────────────────────────────────
+if _search_q and not df_f.empty:
+    _cols = [c for c in ["name", "url", "category"] if c in df_f.columns]
+    if _cols:
+        _mask = df_f[_cols[0]].str.lower().str.contains(_search_q, na=False)
+        for _c in _cols[1:]:
+            _mask = _mask | df_f[_c].str.lower().str.contains(_search_q, na=False)
+        df_f = df_f[_mask]
+    # Bannière résultats
+    _sr_count = len(df_f)
+    st.markdown(
+    f'<div class="search-banner mwrap" style="padding:0 2.5rem;margin-top:56px">'
+    f'<span class="sb-query">"{_search_q}"</span>'
+    f'<span class="sb-count">— {_sr_count} site{"s" if _sr_count!=1 else ""} trouvé{"s" if _sr_count!=1 else ""}</span>'
+    f'<a href="?" class="sb-clear">Effacer la recherche ×</a>'
+    f'</div>',
+    unsafe_allow_html=True
+    )
 
 
 # ══════════════════════════════════════════════════════════════════════════════
