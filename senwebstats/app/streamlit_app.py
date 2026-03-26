@@ -3007,127 +3007,74 @@ elif page == "assistant":
     except ImportError:
         _GROQ_OK = False
 
-    st.markdown('<div class="mwrap">', unsafe_allow_html=True)
-    page_header(
-        "IA · Analyse · Insights",
-        'Assistant <span class="acc">IA</span>',
-        "Posez vos questions sur les données — l'IA analyse la base en temps réel",
-    )
-
-    # ── Styles chat ────────────────────────────────────────────────────────────
-    st.markdown("""
-    <style>
-    /* Conteneur chat */
-    .chat-wrap { max-width: 820px; margin: 0 auto; }
-
-    /* Bulle utilisateur */
-    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
-      background: #3D3215 !important;
-      border-radius: 16px 0 16px 16px !important;
-      border: none !important;
-      margin-bottom: .75rem !important;
-      box-shadow: 0 2px 12px rgba(61,50,21,0.2) !important;
-    }
-    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) p,
-    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) div {
-      color: #FFFFFF !important;
-    }
-
-    /* Bulle assistant */
-    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) {
-      background: #FFFFFF !important;
-      border-radius: 0 16px 16px 16px !important;
-      border: 1px solid rgba(201,168,76,0.2) !important;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
-      margin-bottom: .75rem !important;
-    }
-    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) p,
-    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) div {
-      color: #1A1A2E !important;
-      font-family: Inter, sans-serif !important;
-      font-size: 0.9rem !important;
-    }
-
-    /* Avatar assistant (icone IA) */
-    [data-testid="stChatMessageAvatarAssistant"] {
-      background: #C9A84C !important;
-      border-radius: 8px !important;
-      color: white !important;
-      font-weight: 700 !important;
-      font-size: 0.75rem !important;
-      font-family: 'Space Mono', monospace !important;
-    }
-
-    /* Avatar utilisateur */
-    [data-testid="stChatMessageAvatarUser"] {
-      background: #C9A84C !important;
-      border-radius: 50% !important;
-      color: white !important;
-      font-weight: 700 !important;
-      font-size: 0.8rem !important;
-    }
-
-    /* Zone messages */
-    [data-testid="stChatMessageContent"] {
-      background: transparent !important;
-    }
-
-    /* Input du chat */
-    [data-testid="stChatInput"] textarea,
-    [data-testid="stChatInputTextArea"] {
-      background: #FFFFFF !important;
-      border: 1.5px solid rgba(201,168,76,0.4) !important;
-      border-radius: 12px !important;
-      color: #1A1A2E !important;
-      font-family: Inter, sans-serif !important;
-      font-size: 0.9rem !important;
-      padding: 0.9rem 1.25rem !important;
-      box-shadow: 0 2px 12px rgba(201,168,76,0.08) !important;
-    }
-    [data-testid="stChatInput"] textarea:focus,
-    [data-testid="stChatInputTextArea"]:focus {
-      border-color: #C9A84C !important;
-      box-shadow: 0 0 0 3px rgba(201,168,76,0.15) !important;
-      outline: none !important;
-    }
-    [data-testid="stChatInput"] textarea::placeholder {
-      color: #9CA3AF !important;
-      font-style: italic;
-    }
-
-    /* Bouton envoi */
-    [data-testid="stChatInputSubmitButton"] button {
-      background: #C9A84C !important;
-      border-radius: 8px !important;
-      color: white !important;
-      transition: all 0.2s ease !important;
-    }
-    [data-testid="stChatInputSubmitButton"] button:hover {
-      background: #8B6914 !important;
-      transform: scale(1.05) !important;
-    }
-
-    /* Zone de messages avec scroll */
-    .chat-area {
-      background: #F9F5EE;
-      border: 1px solid rgba(201,168,76,0.15);
-      border-radius: 16px;
-      padding: 1.5rem;
-      min-height: 400px;
-      max-height: 500px;
-      overflow-y: auto;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
+    # ── Garde-fous AVANT l'ouverture du mwrap ──────────────────────────────────
     if not _GROQ_OK:
-        st.markdown('<div class="ibox">Module manquant — lance : <code>pip install groq</code></div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="mwrap"><div class="ibox" style="margin-top:2rem">'
+            'Module <code>groq</code> manquant — lance : '
+            '<code>pip install groq</code></div></div>',
+            unsafe_allow_html=True)
         st.stop()
 
     _api_key = os.environ.get("GROQ_API_KEY", "")
     if not _api_key:
-        st.markdown('<div class="ibox">Clé GROQ_API_KEY manquante dans .env</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="mwrap"><div class="ibox" style="margin-top:2rem">'
+            'Variable <code>GROQ_API_KEY</code> manquante dans <code>.env</code>.'
+            '</div></div>',
+            unsafe_allow_html=True)
         st.stop()
+
+    # ── Ouverture mwrap + header (seulement si on arrive ici) ─────────────────
+    st.markdown('<div class="mwrap">', unsafe_allow_html=True)
+    page_header(
+        "IA · Analyse · Insights",
+        'Assistant <span class="acc">IA</span>',
+        "Posez vos questions sur les donnees — l'IA analyse la base en temps reel",
+    )
+
+    # ── Styles chat (dans le global CSS block, non strippes) ───────────────────
+    st.markdown("""<style>
+.chat-wrap { max-width:820px; margin:0 auto; }
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
+  background:#3D3215 !important; border-radius:16px 0 16px 16px !important;
+  border:none !important; margin-bottom:.75rem !important;
+  box-shadow:0 2px 12px rgba(61,50,21,0.2) !important;
+}
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) p,
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) div { color:#FFFFFF !important; }
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) {
+  background:#FFFFFF !important; border-radius:0 16px 16px 16px !important;
+  border:1px solid rgba(201,168,76,0.2) !important;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06) !important; margin-bottom:.75rem !important;
+}
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) p,
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) div {
+  color:#1A1A2E !important; font-family:Inter,sans-serif !important; font-size:0.9rem !important;
+}
+[data-testid="stChatMessageAvatarAssistant"] {
+  background:#C9A84C !important; border-radius:8px !important; color:white !important;
+  font-weight:700 !important; font-size:0.75rem !important; font-family:'Space Mono',monospace !important;
+}
+[data-testid="stChatMessageAvatarUser"] {
+  background:#C9A84C !important; border-radius:50% !important; color:white !important;
+  font-weight:700 !important; font-size:0.8rem !important;
+}
+[data-testid="stChatMessageContent"] { background:transparent !important; }
+[data-testid="stChatInput"] textarea,[data-testid="stChatInputTextArea"] {
+  background:#FFFFFF !important; border:1.5px solid rgba(201,168,76,0.4) !important;
+  border-radius:12px !important; color:#1A1A2E !important;
+  font-family:Inter,sans-serif !important; font-size:0.9rem !important;
+  padding:0.9rem 1.25rem !important; box-shadow:0 2px 12px rgba(201,168,76,0.08) !important;
+}
+[data-testid="stChatInput"] textarea:focus,[data-testid="stChatInputTextArea"]:focus {
+  border-color:#C9A84C !important; box-shadow:0 0 0 3px rgba(201,168,76,0.15) !important; outline:none !important;
+}
+[data-testid="stChatInputSubmitButton"] button {
+  background:#C9A84C !important; border-radius:8px !important; color:white !important; transition:all 0.2s !important;
+}
+[data-testid="stChatInputSubmitButton"] button:hover { background:#8B6914 !important; }
+</style>""", unsafe_allow_html=True)
 
     # ── Vérification clé API ────────────────────────────────────────────────────
     @st.cache_data(ttl=120)
