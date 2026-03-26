@@ -1305,10 +1305,9 @@ with st.sidebar:
     _year  = datetime.now().strftime("%Y")
     _time  = datetime.now().strftime("%H:%M")
     st.markdown(f"""
-    <div style="position:absolute;bottom:0;left:0;right:0;
-                padding:1.25rem 1.25rem 1.5rem;
+    <div style="margin-top:2rem;padding:1.25rem 1.25rem 1.5rem;
                 border-top:1px solid rgba(61,43,0,0.15);
-                background:rgba(61,43,0,0.06)">
+                background:rgba(61,43,0,0.06);border-radius:0 0 4px 4px">
       <div style="font-family:'Inter',sans-serif;font-size:.45rem;font-weight:700;
                   letter-spacing:.25em;text-transform:uppercase;
                   color:rgba(61,43,0,0.35);margin-bottom:.5rem">Aujourd'hui</div>
