@@ -3314,7 +3314,7 @@ Données du contexte ci-dessous (mises à jour en temps réel depuis la base) :
     # ── Historique ──────────────────────────────────────────────────────────────
     st.markdown('<div class="chat-wrap">', unsafe_allow_html=True)
     for msg in st.session_state.chat_messages:
-        with st.chat_message(msg["role"], avatar="S" if msg["role"]=="user" else "IA"):
+        with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
     # ── Détection message en attente (via bouton suggestion) ────────────────────
@@ -3349,7 +3349,7 @@ Données du contexte ci-dessous (mises à jour en temps réel depuis la base) :
     # ── Traitement message en attente (suggestion cliquée) ──────────────────────
     if _pending:
         pending_q = st.session_state.chat_messages[-1]["content"]
-        with st.chat_message("assistant", avatar="IA"):
+        with st.chat_message("assistant"):
             with st.spinner("Analyse en cours…"):
                 answer = _generate_answer(pending_q)
             st.markdown(answer)
@@ -3362,10 +3362,10 @@ Données du contexte ci-dessous (mises à jour en temps réel depuis la base) :
 
     if user_input:
         st.session_state.chat_messages.append({"role": "user", "content": user_input})
-        with st.chat_message("user", avatar="S"):
+        with st.chat_message("user"):
             st.markdown(user_input)
 
-        with st.chat_message("assistant", avatar="IA"):
+        with st.chat_message("assistant"):
             with st.spinner("Analyse en cours…"):
                 answer = _generate_answer(user_input)
             st.markdown(answer)
