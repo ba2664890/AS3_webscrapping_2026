@@ -9,6 +9,7 @@ sys.stdout.reconfigure(encoding="utf-8")
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 import streamlit as st
+import streamlit.components.v1 as _stc
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
@@ -29,6 +30,7 @@ except Exception:
     CATEGORY_LABELS = {"presse":"Presse & Medias","ecommerce":"E-commerce","telephonie":"Telephonie","banque_finance":"Banque & Finance","emploi":"Emploi"}
 
 # ── Senegal map image (base64) ──────────────────────────────────────────────
+@st.cache_resource
 def _load_img_b64(fname: str) -> str:
     p = os.path.join(os.path.dirname(os.path.abspath(__file__)), fname)
     if os.path.exists(p):
@@ -129,6 +131,16 @@ st.markdown("""
   0%   { opacity:0; transform:translateY(0) scale(0); }
   30%  { opacity:1; }
   100% { opacity:0; transform:translateY(-18px) scale(1.6); }
+}
+@keyframes skeleton-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg,#f0f0f0 25%,#e8e0d0 50%,#f0f0f0 75%);
+  background-size: 400px 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+  border-radius: 8px;
 }
 
 /* ═══════════════════════════════════════
@@ -770,6 +782,21 @@ html,body {
   background:var(--gold); display:inline-block;
   animation:pulse-glow 2s ease-in-out infinite;
 }
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════ */
+@media (max-width: 1200px) {
+  .kpi-wrap { padding:.9rem 1rem; }
+  .kpi-value { font-size:1.5rem; }
+  .ph-title { font-size:1.6rem; }
+}
+@media (max-width: 900px) {
+  .mwrap { padding:1.25rem 1rem; }
+  .ph-title { font-size:1.3rem; }
+  .site-footer { flex-direction:column; gap:1.5rem; text-align:center; }
+  .footer-divider { display:none; }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -1187,14 +1214,47 @@ def make_sunburst(df, value_col, label_col="name", cat_col="category", height=42
     return fig
 
 
+def render_sector_pills():
+    """Pills de filtre secteur — affichees en haut de chaque page."""
+    cats_df  = q("SELECT DISTINCT category FROM sites ORDER BY category")
+    cat_opts = ["Tous"] + (list(cats_df["category"].values) if not cats_df.empty else [])
+    label_map = {**{"Tous": "Tous secteurs"}, **CATEGORY_LABELS}
+    if "cat_filter" not in st.session_state:
+        st.session_state.cat_filter = "Tous"
+    cols = st.columns(len(cat_opts), gap="small")
+    for i, (col, opt) in enumerate(zip(cols, cat_opts)):
+        is_active = st.session_state.cat_filter == opt
+        with col:
+            if is_active:
+                st.markdown(
+                    f'<div style="background:linear-gradient(135deg,#C9A84C,#F0D080);'
+                    f'color:#3D2B00;border-radius:20px;padding:.3rem .8rem;'
+                    f'font-family:Inter,sans-serif;font-size:.6rem;font-weight:700;'
+                    f'letter-spacing:.08em;text-transform:uppercase;text-align:center;'
+                    f'cursor:default;">{label_map.get(opt, opt)}</div>',
+                    unsafe_allow_html=True
+                )
+            else:
+                if st.button(label_map.get(opt, opt), key=f"pill_{opt}_{i}"):
+                    st.session_state.cat_filter = opt
+                    st.rerun()
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # CHARGEMENT GLOBAL
 # ══════════════════════════════════════════════════════════════════════════════
-df_all    = compute_scores()
-n_sites   = sv("SELECT COUNT(*) as n FROM sites")
-n_crawled = sv("SELECT COUNT(DISTINCT site_id) as n FROM site_metadata")
-n_perf    = sv("SELECT COUNT(DISTINCT site_id) as n FROM site_performance")
-n_bl      = sv("SELECT COUNT(DISTINCT site_id) as n FROM site_backlinks")
+@st.cache_data(ttl=60)
+def _load_counts():
+    return (
+        sv("SELECT COUNT(*) as n FROM sites"),
+        sv("SELECT COUNT(DISTINCT site_id) as n FROM site_metadata"),
+        sv("SELECT COUNT(DISTINCT site_id) as n FROM site_performance"),
+        sv("SELECT COUNT(DISTINCT site_id) as n FROM site_backlinks"),
+    )
+
+with st.spinner(""):
+    df_all = compute_scores()
+n_sites, n_crawled, n_perf, n_bl = _load_counts()
 total_tr  = int(df_all["trafic_estime"].sum()) if not df_all.empty else 0
 avg_sc    = round(df_all["score_global"].mean(), 1) if not df_all.empty else 0
 now       = datetime.now().strftime("%d %b %Y · %H:%M")
@@ -1210,6 +1270,34 @@ except Exception:
 # ══════════════════════════════════════════════════════════════════════════════
 if "page" not in st.session_state:
     st.session_state.page = "dashboard"
+
+# ── Garde-fou DB absente ───────────────────────────────────────────────────────
+if get_conn() is None:
+    st.markdown("""
+    <div style="min-height:80vh;display:flex;align-items:center;justify-content:center;
+                font-family:'Inter',sans-serif">
+      <div style="text-align:center;max-width:480px;padding:3rem">
+        <div style="font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:700;
+                    color:#C9A84C;margin-bottom:1rem">SenWebStats</div>
+        <div style="font-size:1rem;font-weight:600;color:#1A1A2E;margin-bottom:.75rem">
+          Base de données introuvable
+        </div>
+        <div style="font-size:.85rem;color:#6B7280;line-height:1.7;margin-bottom:2rem">
+          Le fichier <code style="background:#F3F4F6;padding:.15rem .4rem;border-radius:4px">senwebstats.db</code>
+          est absent. Place-le dans <code style="background:#F3F4F6;padding:.15rem .4rem;border-radius:4px">senwebstats/data/</code>
+          puis relance l'application.
+        </div>
+        <div style="font-family:'Space Mono',monospace;font-size:.7rem;
+                    background:#1A1A2E;color:#C9A84C;padding:1rem 1.25rem;
+                    border-radius:10px;text-align:left;line-height:2">
+          cd senwebstats<br>
+          python scripts/crawl.py<br>
+          streamlit run app/streamlit_app.py
+        </div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.stop()
 
 NAV = [
     ("dashboard",  "Dashboard"),
@@ -1250,6 +1338,13 @@ with st.sidebar:
       <span class="sb-dot"></span>
       Live · {n_sites} sites
     </div>
+    """, unsafe_allow_html=True)
+    st.markdown('<div style="padding:.25rem 1rem .5rem">', unsafe_allow_html=True)
+    if st.button("Actualiser les données", key="btn_refresh", use_container_width=True):
+        st.cache_data.clear()
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("""
     <div class="sb-div"></div>
     <div class="sb-section">Navigation</div>
     """, unsafe_allow_html=True)
@@ -1297,7 +1392,9 @@ with st.sidebar:
         st.markdown('</div>', unsafe_allow_html=True)
 
     # ── DATE ELEGANTE (remplace le filtre secteur) ─────────────────────────────
-    cat_f = "Tous secteurs"
+    cat_f = st.session_state.get("cat_filter", "Tous")
+    if cat_f == "Tous":
+        cat_f = "Tous secteurs"
 
     # ── SIDEBAR DATE FOOTER ─────────────────────────────────────────────────────
     _day   = datetime.now().strftime("%d")
@@ -1348,6 +1445,22 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 page    = st.session_state.page
+# ── Titre dynamique ────────────────────────────────────────────────────────────
+_PAGE_TITLES = {
+    "dashboard": "Dashboard",
+    "scoring":   "Scoring & Trafic",
+    "meta":      "Metadonnees",
+    "perf":      "Performance",
+    "backlinks": "Backlinks",
+    "compare":   "Comparaison",
+    "veille":    "Veille & Tendances",
+    "export":    "Rapports & Export",
+    "assistant": "Assistant IA",
+}
+_stc.html(
+    f"<script>try{{parent.document.title='SenWebStats · {_PAGE_TITLES.get(page,'')}'}}catch(e){{}}</script>",
+    height=0, scrolling=False
+)
 df_f    = df_all if cat_f == "Tous secteurs" else df_all[df_all["category"] == cat_f]
 cat_sql = "" if cat_f == "Tous secteurs" else f"AND s.category = '{cat_f}'"
 
@@ -1575,6 +1688,36 @@ elif page == "scoring":
         'Scoring & <span class="acc">Trafic Estime</span>',
         "Autorite (45%) · Qualite (35%) · Technique (20%) · Modele CTR AWR 2023",
     )
+    with st.expander("Methodologie du score composite — comment est calcule le score ?"):
+        st.markdown("""
+        <div style="font-family:Inter,sans-serif;font-size:.85rem;color:#374151;line-height:1.8;padding:.5rem 0">
+        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;
+                    color:#1A1A2E;margin-bottom:1rem">Formule composite</div>
+        <div style="background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(240,208,128,0.03));
+                    border:1px solid rgba(201,168,76,0.15);border-radius:10px;
+                    padding:1rem 1.25rem;font-family:'Space Mono',monospace;
+                    font-size:.8rem;color:#1A1A2E;margin-bottom:1.25rem">
+          Score Global = Autorité × 0.45 + Qualité × 0.35 + Technique × 0.20
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+          <div style="border-left:3px solid #C9A84C;padding-left:.75rem">
+            <div style="font-weight:700;color:#1A1A2E;margin-bottom:.25rem">Autorité (45%)</div>
+            <div style="font-size:.78rem;color:#6B7280">Open PageRank (60%) + CommonCrawl backlinks (40%). Mesure la notoriété du domaine sur le web.</div>
+          </div>
+          <div style="border-left:3px solid #C9A84C;padding-left:.75rem">
+            <div style="font-weight:700;color:#1A1A2E;margin-bottom:.25rem">Qualité (35%)</div>
+            <div style="font-size:.78rem;color:#6B7280">SEO PageSpeed (40%) + Performance Lighthouse (35%) + Accessibilité (25%). Mesure l'expérience utilisateur.</div>
+          </div>
+          <div style="border-left:3px solid #C9A84C;padding-left:.75rem">
+            <div style="font-weight:700;color:#1A1A2E;margin-bottom:.25rem">Technique (20%)</div>
+            <div style="font-size:.78rem;color:#6B7280">SSL + Sitemap + Robots.txt + Temps de réponse + Contenu. Mesure la santé technique du site.</div>
+          </div>
+        </div>
+        <div style="font-size:.75rem;color:#9CA3AF;border-top:1px solid rgba(0,0,0,0.06);padding-top:.75rem">
+          Trafic estimé via modèle CTR AWR 2023 · Données : CommonCrawl, Open PageRank, Google PageSpeed API, Google Trends (geo=SN)
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
     if df_f.empty:
         st.markdown('<div class="ibox">Aucune donnee disponible.</div>', unsafe_allow_html=True)
     else:
@@ -2062,7 +2205,7 @@ elif page == "veille":
     st.markdown('<div class="mwrap">', unsafe_allow_html=True)
     page_header(
         "Intelligence Strategique · Simulation · Risques",
-        'Veille & <span class="acc">Tendances</span>',
+        'Veille & <span class="acc">Tendances</span> <span style="font-family:Inter,sans-serif;font-size:.7rem;font-weight:700;background:rgba(201,168,76,0.15);color:#8B6914;border:1px solid rgba(201,168,76,0.3);border-radius:4px;padding:.15rem .5rem;letter-spacing:.08em;vertical-align:middle">BETA</span>',
         "Simulateur d'impact · Opportunites de croissance · Sites a risque",
     )
 
