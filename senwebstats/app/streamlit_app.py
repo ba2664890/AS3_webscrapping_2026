@@ -1762,73 +1762,49 @@ elif page == "scoring":
         'Scoring & <span class="acc">Trafic Estime</span>',
         "Autorite (45%) · Qualite (35%) · Technique (20%) · Modele CTR AWR 2023",
     )
-    st.markdown("""
-<div class="methodo-card">
-  <div class="methodo-shimmer"></div>
-  <div class="methodo-inner">
-
-    <div class="methodo-eyebrow">Transparence · Reproductibilité · Open Data</div>
-    <div class="methodo-title">Méthodologie du Score Composite</div>
-
-    <div class="methodo-formula">
-      Score Global
-      <span class="mf-op"> = </span>
-      <span class="mf-gold">Autorité</span>
-      <span class="mf-op"> × </span>0.45
-      <span class="mf-op"> + </span>
-      <span class="mf-gold">Qualité</span>
-      <span class="mf-op"> × </span>0.35
-      <span class="mf-op"> + </span>
-      <span class="mf-gold">Technique</span>
-      <span class="mf-op"> × </span>0.20
-    </div>
-
-    <div class="methodo-pillars">
-      <div class="mp">
-        <div class="mp-pct">45%</div>
-        <div class="mp-name">Autorité</div>
-        <div class="mp-bar-bg"><div class="mp-bar-fill" style="width:45%"></div></div>
-        <div class="mp-sub">
-          <strong>Open PageRank</strong> · 60%<br>
-          <strong>CommonCrawl backlinks</strong> · 40%<br><br>
-          Mesure la notoriété et l'influence du domaine sur le web international.
-        </div>
-      </div>
-      <div class="mp">
-        <div class="mp-pct">35%</div>
-        <div class="mp-name">Qualité</div>
-        <div class="mp-bar-bg"><div class="mp-bar-fill" style="width:35%"></div></div>
-        <div class="mp-sub">
-          <strong>SEO PageSpeed</strong> · 40%<br>
-          <strong>Performance Lighthouse</strong> · 35%<br>
-          <strong>Accessibilité</strong> · 25%<br><br>
-          Mesure l'expérience utilisateur réelle.
-        </div>
-      </div>
-      <div class="mp">
-        <div class="mp-pct">20%</div>
-        <div class="mp-name">Technique</div>
-        <div class="mp-bar-bg"><div class="mp-bar-fill" style="width:20%"></div></div>
-        <div class="mp-sub">
-          <strong>SSL + Sitemap + Robots</strong><br>
-          <strong>Temps de réponse + Contenu</strong><br><br>
-          Mesure la santé technique et la conformité des bonnes pratiques.
-        </div>
-      </div>
-    </div>
-
-    <div class="methodo-sources">
-      <span class="ms-label">Sources</span>
-      <span class="ms-chip">CommonCrawl</span>
-      <span class="ms-chip">Open PageRank</span>
-      <span class="ms-chip">Google PageSpeed API</span>
-      <span class="ms-chip">Google Trends · geo=SN</span>
-      <span class="ms-chip">CTR Model AWR 2023</span>
-    </div>
-
-  </div>
-</div>
-""", unsafe_allow_html=True)
+    st.markdown(
+'<div class="methodo-card">'
+'<div class="methodo-shimmer"></div>'
+'<div class="methodo-inner">'
+'<div class="methodo-eyebrow">Transparence · Reproductibilité · Open Data</div>'
+'<div class="methodo-title">Méthodologie du Score Composite</div>'
+'<div class="methodo-formula">'
+'Score Global <span class="mf-op">=</span> '
+'<span class="mf-gold">Autorité</span> <span class="mf-op">×</span> 0.45 '
+'<span class="mf-op">+</span> <span class="mf-gold">Qualité</span> <span class="mf-op">×</span> 0.35 '
+'<span class="mf-op">+</span> <span class="mf-gold">Technique</span> <span class="mf-op">×</span> 0.20'
+'</div>'
+'<div class="methodo-pillars">'
+'<div class="mp">'
+'<div class="mp-pct">45%</div>'
+'<div class="mp-name">Autorité</div>'
+'<div class="mp-bar-bg"><div class="mp-bar-fill" style="width:45%"></div></div>'
+'<div class="mp-sub"><strong>Open PageRank</strong> · 60%<br><strong>CommonCrawl backlinks</strong> · 40%<br><br>Mesure la notoriété et l\'influence du domaine sur le web international.</div>'
+'</div>'
+'<div class="mp">'
+'<div class="mp-pct">35%</div>'
+'<div class="mp-name">Qualité</div>'
+'<div class="mp-bar-bg"><div class="mp-bar-fill" style="width:35%"></div></div>'
+'<div class="mp-sub"><strong>SEO PageSpeed</strong> · 40%<br><strong>Performance Lighthouse</strong> · 35%<br><strong>Accessibilité</strong> · 25%<br><br>Mesure l\'expérience utilisateur réelle.</div>'
+'</div>'
+'<div class="mp">'
+'<div class="mp-pct">20%</div>'
+'<div class="mp-name">Technique</div>'
+'<div class="mp-bar-bg"><div class="mp-bar-fill" style="width:20%"></div></div>'
+'<div class="mp-sub"><strong>SSL + Sitemap + Robots</strong><br><strong>Temps de réponse + Contenu</strong><br><br>Mesure la santé technique et la conformité des bonnes pratiques.</div>'
+'</div>'
+'</div>'
+'<div class="methodo-sources">'
+'<span class="ms-label">Sources</span>'
+'<span class="ms-chip">CommonCrawl</span>'
+'<span class="ms-chip">Open PageRank</span>'
+'<span class="ms-chip">Google PageSpeed API</span>'
+'<span class="ms-chip">Google Trends · geo=SN</span>'
+'<span class="ms-chip">CTR Model AWR 2023</span>'
+'</div>'
+'</div>'
+'</div>',
+unsafe_allow_html=True)
     if df_f.empty:
         st.markdown('<div class="ibox">Aucune donnee disponible.</div>', unsafe_allow_html=True)
     else:
