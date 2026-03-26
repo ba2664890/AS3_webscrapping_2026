@@ -319,7 +319,7 @@ html,body {
 /* ═══════════════════════════════════════
    MAIN CONTENT
 ═══════════════════════════════════════ */
-.mwrap { padding:2.5rem 2.5rem 6rem; background:transparent; }
+.mwrap { padding:calc(58px + 2rem) 2.5rem 6rem; background:transparent; }
 
 /* ── ANIMATIONS ── */
 .anim-0 { animation:fadeInUp .5s ease .1s both; }
@@ -871,6 +871,97 @@ html,body {
 .methodo-sources { border-top:1px solid rgba(201,168,76,.12); padding-top:1.25rem; display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; }
 .ms-label { font-family:'Inter',sans-serif; font-size:.5rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:rgba(201,168,76,.4); margin-right:.5rem; }
 .ms-chip { font-family:'Space Mono',monospace; font-size:.6rem; color:rgba(240,208,128,.6); background:rgba(255,255,255,.04); border:1px solid rgba(201,168,76,.15); border-radius:6px; padding:.2rem .6rem; letter-spacing:.05em; }
+
+/* ═══════════════════════════════════════
+   PRO TOPBAR
+═══════════════════════════════════════ */
+@keyframes bell-ring {
+  0%,100% { transform:rotate(0deg); }
+  15%     { transform:rotate(14deg); }
+  30%     { transform:rotate(-12deg); }
+  45%     { transform:rotate(8deg); }
+  60%     { transform:rotate(-5deg); }
+}
+.pro-topbar {
+  position:fixed; top:0; left:21rem; right:0; height:58px; z-index:900;
+  background:rgba(255,255,255,0.97);
+  backdrop-filter:blur(14px) saturate(180%);
+  border-bottom:1px solid rgba(201,168,76,0.18);
+  box-shadow:0 2px 24px rgba(0,0,0,0.05);
+  display:flex; align-items:center;
+  padding:0 2rem; gap:1.5rem;
+}
+.ptb-breadcrumb {
+  display:flex; align-items:center; gap:.5rem; flex-shrink:0;
+}
+.ptb-brand {
+  font-family:'Space Mono',monospace; font-size:.58rem; font-weight:700;
+  color:var(--gold-dark); letter-spacing:.14em; text-transform:uppercase;
+}
+.ptb-sep { font-size:.75rem; color:rgba(0,0,0,0.18); }
+.ptb-page {
+  font-family:'Inter',sans-serif; font-size:.78rem; font-weight:600;
+  color:var(--text); letter-spacing:.02em;
+}
+.ptb-search-wrap {
+  flex:1; max-width:380px; margin:0 auto;
+  display:flex; align-items:center; gap:.6rem;
+  background:rgba(250,246,236,0.85);
+  border:1.5px solid rgba(201,168,76,0.18);
+  border-radius:28px; padding:.38rem 1.1rem;
+  transition:all .25s ease;
+}
+.ptb-search-wrap:focus-within {
+  border-color:rgba(201,168,76,0.48);
+  background:rgba(255,253,245,0.98);
+  box-shadow:0 0 0 3px rgba(201,168,76,0.09);
+}
+.ptb-search-icon { color:#B0965A; flex-shrink:0; }
+.ptb-search-input {
+  flex:1; border:none; background:transparent; outline:none;
+  font-family:'Inter',sans-serif; font-size:.76rem; color:var(--text);
+  min-width:0;
+}
+.ptb-search-input::placeholder { color:#B0A080; font-weight:400; }
+.ptb-actions {
+  display:flex; align-items:center; gap:.85rem; flex-shrink:0; margin-left:auto;
+}
+.ptb-divider { width:1px; height:22px; background:rgba(0,0,0,0.07); }
+.ptb-bell {
+  position:relative; cursor:pointer;
+  width:36px; height:36px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .2s;
+}
+.ptb-bell:hover { background:rgba(201,168,76,0.1); }
+.ptb-bell:hover svg { animation:bell-ring .55s ease; }
+.ptb-badge {
+  position:absolute; top:3px; right:3px;
+  min-width:16px; height:16px; border-radius:8px; padding:0 3px;
+  background:linear-gradient(135deg,#EF4444,#DC2626);
+  border:2px solid #fff;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Inter',sans-serif; font-size:.45rem; font-weight:800;
+  color:#fff; line-height:1;
+}
+.ptb-badge--zero { background:linear-gradient(135deg,#C9A84C,#8B6914); }
+.ptb-refresh {
+  display:flex; align-items:center; gap:.45rem;
+  font-family:'Space Mono',monospace; font-size:.52rem;
+  color:#A0937A; letter-spacing:.06em; white-space:nowrap;
+}
+.ptb-refresh-dot {
+  width:6px; height:6px; border-radius:50%; flex-shrink:0;
+  background:#10B981; animation:pulse-dot 2.4s ease infinite;
+}
+.ptb-avatar {
+  width:32px; height:32px; border-radius:9px; flex-shrink:0;
+  background:linear-gradient(135deg,#C9A84C 0%,#8B6914 100%);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Space Mono',monospace; font-weight:700;
+  font-size:.58rem; color:#fff; letter-spacing:.05em;
+  box-shadow:0 2px 8px rgba(201,168,76,0.35);
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -1535,6 +1626,39 @@ _stc.html(
     f"<script>try{{parent.document.title='SenWebStats · {_PAGE_TITLES.get(page,'')}'}}catch(e){{}}</script>",
     height=0, scrolling=False
 )
+
+# ── PRO TOPBAR ─────────────────────────────────────────────────────────────────
+_n_alerts  = int((df_all["score_global"] < 30).sum()) if "score_global" in df_all.columns else 0
+_page_lbl  = _PAGE_TITLES.get(page, page.replace("_"," ").capitalize())
+_tb_time   = datetime.now().strftime("%H:%M")
+_tb_date   = datetime.now().strftime("%d %b")
+if _n_alerts > 0:
+    _badge = f'<div class="ptb-badge">{_n_alerts}</div>'
+else:
+    _badge = '<div class="ptb-badge ptb-badge--zero">0</div>'
+
+st.markdown(
+'<div class="pro-topbar">'
+'<div class="ptb-breadcrumb">'
+'<span class="ptb-brand">SenWebStats</span>'
+'<span class="ptb-sep"> / </span>'
+f'<span class="ptb-page">{_page_lbl}</span>'
+'</div>'
+'<div class="ptb-search-wrap">'
+'<svg class="ptb-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
+'<input class="ptb-search-input" type="text" placeholder="Rechercher un site, secteur ou indicateur…" />'
+'</div>'
+'<div class="ptb-actions">'
+f'<div class="ptb-bell"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7B6030" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>{_badge}</div>'
+'<div class="ptb-divider"></div>'
+f'<div class="ptb-refresh"><div class="ptb-refresh-dot"></div>Mis a jour {_tb_date} · {_tb_time}</div>'
+'<div class="ptb-divider"></div>'
+'<div class="ptb-avatar">SN</div>'
+'</div>'
+'</div>',
+unsafe_allow_html=True
+)
+
 df_f    = df_all if cat_f == "Tous secteurs" else df_all[df_all["category"] == cat_f]
 cat_sql = "" if cat_f == "Tous secteurs" else f"AND s.category = '{cat_f}'"
 
