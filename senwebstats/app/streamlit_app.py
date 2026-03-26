@@ -797,6 +797,80 @@ html,body {
   .site-footer { flex-direction:column; gap:1.5rem; text-align:center; }
   .footer-divider { display:none; }
 }
+
+/* ══════════════════════════════════════════════════════════
+   METHODOLOGY CARD
+══════════════════════════════════════════════════════════ */
+@keyframes shimmer-bar {
+  0%   { background-position:-200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes mp-bar-in {
+  from { width:0%; opacity:0; }
+  to   { opacity:1; }
+}
+.methodo-card {
+  border-radius:20px;
+  background:linear-gradient(135deg,#1A1200 0%,#2D2000 45%,#3D3215 75%,#1A1200 100%);
+  overflow:hidden; margin-bottom:2.25rem;
+  box-shadow:0 12px 48px rgba(201,168,76,.22),0 2px 0 rgba(201,168,76,.15) inset;
+  animation:fadeInUp .55s ease both; position:relative;
+}
+.methodo-card::after {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse 60% 80% at 80% 50%,rgba(201,168,76,.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+.methodo-shimmer {
+  height:3px;
+  background:linear-gradient(90deg,transparent 0%,#8B6914 15%,#C9A84C 35%,#F0D080 50%,#C9A84C 65%,#8B6914 85%,transparent 100%);
+  background-size:200% 100%;
+  animation:shimmer-bar 2.2s linear infinite;
+}
+.methodo-inner { padding:2rem 2.5rem 2.5rem; }
+.methodo-eyebrow {
+  font-family:'Inter',sans-serif; font-size:.5rem; font-weight:700;
+  letter-spacing:.28em; text-transform:uppercase;
+  color:rgba(201,168,76,.55); margin-bottom:.6rem;
+}
+.methodo-title {
+  font-family:'Playfair Display',serif; font-size:1.35rem; font-weight:700;
+  color:#F0D080; line-height:1.3; margin-bottom:1.75rem;
+}
+.methodo-formula {
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(201,168,76,.22); border-radius:12px;
+  padding:1.1rem 1.5rem; font-family:'Space Mono',monospace;
+  font-size:.9rem; font-weight:700; color:rgba(255,255,255,.9);
+  letter-spacing:.04em; line-height:1.6;
+  margin-bottom:2rem; position:relative; overflow:hidden;
+}
+.methodo-formula::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,168,76,.4),transparent);
+}
+.mf-gold { color:#F0D080; }
+.mf-op   { color:rgba(255,255,255,.35); }
+.methodo-pillars { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; margin-bottom:2rem; }
+.mp {
+  background:rgba(255,255,255,.04); border:1px solid rgba(201,168,76,.12);
+  border-radius:14px; padding:1.25rem 1.25rem 1.5rem;
+  position:relative; overflow:hidden; transition:border-color .25s,box-shadow .25s;
+}
+.mp:hover { border-color:rgba(201,168,76,.3); box-shadow:0 4px 24px rgba(201,168,76,.12); }
+.mp::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,#C9A84C,#F0D080); border-radius:14px 14px 0 0;
+}
+.mp-pct { font-family:'Space Mono',monospace; font-size:1.8rem; font-weight:700; color:#F0D080; line-height:1; margin-bottom:.5rem; }
+.mp-name { font-family:'Playfair Display',serif; font-size:.85rem; font-weight:700; color:#FFFFFF; margin-bottom:.75rem; }
+.mp-bar-bg { height:4px; background:rgba(255,255,255,.08); border-radius:3px; overflow:hidden; margin-bottom:.85rem; }
+.mp-bar-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,#C9A84C,#F0D080); animation:mp-bar-in 1.2s ease forwards; }
+.mp-sub { font-family:'Inter',sans-serif; font-size:.68rem; color:rgba(255,255,255,.55); line-height:1.6; }
+.mp-sub strong { color:rgba(240,208,128,.8); font-weight:600; }
+.methodo-sources { border-top:1px solid rgba(201,168,76,.12); padding-top:1.25rem; display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; }
+.ms-label { font-family:'Inter',sans-serif; font-size:.5rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:rgba(201,168,76,.4); margin-right:.5rem; }
+.ms-chip { font-family:'Space Mono',monospace; font-size:.6rem; color:rgba(240,208,128,.6); background:rgba(255,255,255,.04); border:1px solid rgba(201,168,76,.15); border-radius:6px; padding:.2rem .6rem; letter-spacing:.05em; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -1689,131 +1763,6 @@ elif page == "scoring":
         "Autorite (45%) · Qualite (35%) · Technique (20%) · Modele CTR AWR 2023",
     )
     st.markdown("""
-<style>
-/* ── METHODO CARD ─────────────────────────────────────── */
-@keyframes shimmer-bar {
-  0%   { background-position:-200% 0; }
-  100% { background-position: 200% 0; }
-}
-@keyframes mp-bar-in {
-  from { width:0%; opacity:0; }
-  to   { opacity:1; }
-}
-.methodo-card {
-  border-radius:20px;
-  background:linear-gradient(135deg,#1A1200 0%,#2D2000 45%,#3D3215 75%,#1A1200 100%);
-  overflow:hidden;
-  margin-bottom:2.25rem;
-  box-shadow:0 12px 48px rgba(201,168,76,.22),0 2px 0 rgba(201,168,76,.15) inset;
-  animation:fadeInUp .55s ease both;
-  position:relative;
-}
-.methodo-card::after {
-  content:'';
-  position:absolute;inset:0;
-  background:radial-gradient(ellipse 60% 80% at 80% 50%,rgba(201,168,76,.06) 0%,transparent 70%);
-  pointer-events:none;
-}
-.methodo-shimmer {
-  height:3px;
-  background:linear-gradient(90deg,
-    transparent 0%,#8B6914 15%,#C9A84C 35%,#F0D080 50%,#C9A84C 65%,#8B6914 85%,transparent 100%);
-  background-size:200% 100%;
-  animation:shimmer-bar 2.2s linear infinite;
-}
-.methodo-inner {
-  padding:2rem 2.5rem 2.5rem;
-}
-.methodo-eyebrow {
-  font-family:'Inter',sans-serif;font-size:.5rem;font-weight:700;
-  letter-spacing:.28em;text-transform:uppercase;
-  color:rgba(201,168,76,.55);margin-bottom:.6rem;
-}
-.methodo-title {
-  font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;
-  color:#F0D080;line-height:1.3;margin-bottom:1.75rem;
-}
-.methodo-formula {
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(201,168,76,.22);
-  border-radius:12px;
-  padding:1.1rem 1.5rem;
-  font-family:'Space Mono',monospace;
-  font-size:.9rem;font-weight:700;
-  color:rgba(255,255,255,.9);
-  letter-spacing:.04em;line-height:1.6;
-  margin-bottom:2rem;
-  position:relative;overflow:hidden;
-}
-.methodo-formula::before {
-  content:'';
-  position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(201,168,76,.4),transparent);
-}
-.mf-gold { color:#F0D080; }
-.mf-op   { color:rgba(255,255,255,.35); }
-.methodo-pillars {
-  display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;
-  margin-bottom:2rem;
-}
-.mp {
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(201,168,76,.12);
-  border-radius:14px;padding:1.25rem 1.25rem 1.5rem;
-  position:relative;overflow:hidden;
-  transition:border-color .25s,box-shadow .25s;
-}
-.mp:hover {
-  border-color:rgba(201,168,76,.3);
-  box-shadow:0 4px 24px rgba(201,168,76,.12);
-}
-.mp::before {
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,#C9A84C,#F0D080);
-  border-radius:14px 14px 0 0;
-}
-.mp-pct {
-  font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;
-  color:#F0D080;line-height:1;margin-bottom:.5rem;
-}
-.mp-name {
-  font-family:'Playfair Display',serif;font-size:.85rem;font-weight:700;
-  color:#FFFFFF;margin-bottom:.75rem;
-}
-.mp-bar-bg {
-  height:4px;background:rgba(255,255,255,.08);border-radius:3px;
-  overflow:hidden;margin-bottom:.85rem;
-}
-.mp-bar-fill {
-  height:100%;border-radius:3px;
-  background:linear-gradient(90deg,#C9A84C,#F0D080);
-  animation:mp-bar-in 1.2s ease forwards;
-}
-.mp-sub {
-  font-family:'Inter',sans-serif;font-size:.68rem;
-  color:rgba(255,255,255,.55);line-height:1.6;
-}
-.mp-sub strong { color:rgba(240,208,128,.8);font-weight:600; }
-.methodo-sources {
-  border-top:1px solid rgba(201,168,76,.12);
-  padding-top:1.25rem;
-  display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;
-}
-.ms-label {
-  font-family:'Inter',sans-serif;font-size:.5rem;font-weight:700;
-  letter-spacing:.2em;text-transform:uppercase;color:rgba(201,168,76,.4);
-  margin-right:.5rem;
-}
-.ms-chip {
-  font-family:'Space Mono',monospace;font-size:.6rem;
-  color:rgba(240,208,128,.6);
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(201,168,76,.15);
-  border-radius:6px;padding:.2rem .6rem;
-  letter-spacing:.05em;
-}
-</style>
-
 <div class="methodo-card">
   <div class="methodo-shimmer"></div>
   <div class="methodo-inner">
