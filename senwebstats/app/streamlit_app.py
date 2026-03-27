@@ -174,6 +174,13 @@ section[data-testid="stMain"] > div > div {
   padding-top: 0 !important;
   margin-top: 0 !important;
 }
+/* stMainBlockContainer — nouveau wrapper Streamlit 1.32+ */
+[data-testid="stMainBlockContainer"] {
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+  background: transparent !important;
+}
 .block-container {
   padding: 0 !important;
   margin: 0 !important;
@@ -186,6 +193,8 @@ div[data-testid="element-container"] {
   min-height: 0 !important;
 }
 div[data-testid="element-container"]:empty { display:none !important; }
+/* Spinner vide invisible */
+[data-testid="stSpinner"] { display:none !important; }
 
 /* ═══════════════════════════════════════
    SIDEBAR — DARK GLASSMORPHISM
@@ -244,6 +253,12 @@ div[data-testid="element-container"]:empty { display:none !important; }
 .nav-icon { display:none; }
 
 /* Nav buttons */
+[data-testid="stSidebar"] .stButton {
+  overflow: hidden !important;
+  border-radius: 6px !important;
+  isolation: isolate !important;
+  display: block !important;
+}
 [data-testid="stSidebar"] .stButton > button {
   background:transparent !important;
   color:rgba(240,234,216,0.58) !important;
