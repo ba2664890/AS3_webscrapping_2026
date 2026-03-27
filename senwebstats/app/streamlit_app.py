@@ -164,37 +164,60 @@ html,body {
   font-family:'Inter',sans-serif !important;
   color:var(--text) !important;
 }
+
+/* ── RESET COMPLET de tous les wrappers Streamlit ── */
 section[data-testid="stMain"] {
   background: transparent !important;
   padding-top: 56px !important;
-  margin-top: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-bottom: 0 !important;
+  margin: 0 !important;
 }
-section[data-testid="stMain"] > div,
-section[data-testid="stMain"] > div > div {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-}
-/* stMainBlockContainer — nouveau wrapper Streamlit 1.32+ */
-[data-testid="stMainBlockContainer"] {
+section[data-testid="stMain"] > div { padding: 0 !important; margin: 0 !important; }
+[data-testid="stMainBlockContainer"],
+[data-testid="stMainBlockContainer"] > div {
   padding: 0 !important;
   margin: 0 !important;
   max-width: 100% !important;
   background: transparent !important;
 }
-.block-container {
+.block-container,
+.block-container > div {
   padding: 0 !important;
   margin: 0 !important;
   max-width: 100% !important;
+  background: transparent !important;
 }
-[data-testid="stVerticalBlock"] { gap: 0 !important; }
+[data-testid="stVerticalBlock"] {
+  gap: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
 div[data-testid="element-container"] {
   margin: 0 !important;
   padding: 0 !important;
   min-height: 0 !important;
+  line-height: 0 !important;
+}
+div[data-testid="element-container"] > div {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+div[data-testid="element-container"]:has(> .mwrap),
+div[data-testid="element-container"]:has(> .pro-topbar),
+div[data-testid="element-container"]:has(> .fab-wrap),
+div[data-testid="element-container"]:has(> .gp-panel) {
+  line-height: normal !important;
 }
 div[data-testid="element-container"]:empty { display:none !important; }
-/* Spinner vide invisible */
-[data-testid="stSpinner"] { display:none !important; }
+/* iframe title-script et spinner : espace zéro */
+[data-testid="stSpinner"],
+[data-testid="stSpinnerContainer"] { display:none !important; height:0 !important; }
+iframe { display:block !important; }
+div[data-testid="element-container"]:has(iframe[height="0"]) {
+  height: 0 !important; overflow: hidden !important;
+}
 
 /* ═══════════════════════════════════════
    SIDEBAR — DARK GLASSMORPHISM
