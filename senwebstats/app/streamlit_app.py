@@ -29,6 +29,14 @@ except Exception:
     CATEGORY_BASE = {"presse":250000,"ecommerce":80000,"telephonie":120000,"banque_finance":60000,"emploi":40000}
     CATEGORY_LABELS = {"presse":"Presse & Medias","ecommerce":"E-commerce","telephonie":"Telephonie","banque_finance":"Banque & Finance","emploi":"Emploi"}
 
+# ── set_page_config DOIT être le premier appel Streamlit ───────────────────
+st.set_page_config(
+    page_title="SenWebStats · Observatory",
+    page_icon="S",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
 # ── Senegal map image (base64) ──────────────────────────────────────────────
 @st.cache_resource
 def _load_img_b64(fname: str) -> str:
@@ -41,13 +49,6 @@ def _load_img_b64(fname: str) -> str:
     return ""
 
 _SN_MAP_SRC = _load_img_b64("senegal_map.png")
-
-st.set_page_config(
-    page_title="SenWebStats · Observatory",
-    page_icon="S",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # DESIGN SYSTEM — NATIONAL DIGITAL OBSERVATORY (LIGHT THEME)
