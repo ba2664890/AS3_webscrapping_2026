@@ -3112,13 +3112,15 @@ elif page == "assistant":
 </style>""", unsafe_allow_html=True)
 
     # ── Vérification clé API ────────────────────────────────────────────────────
-    _HF_MODEL = "mistralai/Mistral-7B-Instruct-v0.2"
+    _HF_MODEL    = "mistralai/Mistral-7B-Instruct-v0.3"
+    _HF_PROVIDER = "hf-inference"
 
     @st.cache_data(ttl=120)
     def _check_api(key: str) -> tuple[bool, str]:
         try:
-            c = _HFClient(model=_HF_MODEL, token=key)
+            c = _HFClient(provider=_HF_PROVIDER, token=key)
             c.chat_completion(
+                model=_HF_MODEL,
                 messages=[{"role": "user", "content": "ok"}],
                 max_tokens=5,
             )
@@ -3365,8 +3367,9 @@ Données du contexte ci-dessous (mises à jour en temps réel depuis la base) :
         if _api_ok:
             try:
                 ctx = _build_context()
-                client = _HFClient(model=_HF_MODEL, token=_api_key)
+                client = _HFClient(provider=_HF_PROVIDER, token=_api_key)
                 response = client.chat_completion(
+                    model=_HF_MODEL,
                     messages=[
                         {"role": "system", "content": SYSTEM_PROMPT + "\n\n" + ctx},
                     ] + [
