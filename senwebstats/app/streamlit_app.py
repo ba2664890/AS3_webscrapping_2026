@@ -167,12 +167,18 @@ html,body {
 
 /* ── Wrappers Streamlit : zéro padding/gap ── */
 section[data-testid="stMain"] {
-  background: transparent !important;
-  padding-top: 56px !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  padding-bottom: 0 !important;
+  background:rgba(255,255,255,0.82) !important;
+  backdrop-filter:blur(18px) saturate(160%);
+  -webkit-backdrop-filter:blur(18px) saturate(160%);
+  border-left:1px solid rgba(255,255,255,0.55);
+  border-top:1px solid rgba(255,255,255,0.4);
+  box-shadow:-4px 0 48px rgba(0,0,0,0.07), inset 1px 0 0 rgba(255,255,255,0.6);
+  padding-top: calc(56px + 1.5rem) !important;
+  padding-left: 2.5rem !important;
+  padding-right: 2.5rem !important;
+  padding-bottom: 6rem !important;
   margin: 0 !important;
+  min-height: 100vh !important;
 }
 [data-testid="stMainBlockContainer"] {
   padding: 0 !important;
@@ -361,14 +367,8 @@ div[data-testid="element-container"]:empty { display:none !important; }
    MAIN CONTENT
 ═══════════════════════════════════════ */
 .mwrap {
-  padding:1.5rem 2.5rem 6rem;
-  background:rgba(255,255,255,0.82);
-  backdrop-filter:blur(18px) saturate(160%);
-  -webkit-backdrop-filter:blur(18px) saturate(160%);
-  border-left:1px solid rgba(255,255,255,0.55);
-  border-top:1px solid rgba(255,255,255,0.4);
-  box-shadow:-4px 0 48px rgba(0,0,0,0.07), inset 1px 0 0 rgba(255,255,255,0.6);
-  min-height:calc(100vh - 56px);
+  /* Class kept for compatibility but structural styles moved to stMain */
+  display: contents;
 }
 
 /* ── ANIMATIONS ── */
@@ -1908,7 +1908,7 @@ if _search_q and not df_f.empty:
     # Bannière résultats
     _sr_count = len(df_f)
     st.markdown(
-    f'<div class="search-banner mwrap" style="padding:0 2.5rem">'
+    f'<div class="search-banner" style="padding:0 2.5rem">'
     f'<span class="sb-query">"{_search_q}"</span>'
     f'<span class="sb-count">— {_sr_count} site{"s" if _sr_count!=1 else ""} trouvé{"s" if _sr_count!=1 else ""}</span>'
     f'<a href="?" class="sb-clear">Effacer la recherche ×</a>'
@@ -1921,7 +1921,7 @@ if _search_q and not df_f.empty:
 # PAGE : DASHBOARD
 # ══════════════════════════════════════════════════════════════════════════════
 if page == "dashboard":
-    st.markdown('<div class="mwrap">', unsafe_allow_html=True)
+    # st.markdown('<div class="mwrap">', unsafe_allow_html=True)  # REMOVED split div
     page_header(
         "Live · Observatoire National",
         'Observatoire Web <span class="acc">Senegalais</span>',
@@ -2127,14 +2127,14 @@ if page == "dashboard":
             fig_pos.update_layout(**lay_pos)
             st.plotly_chart(fig_pos, use_container_width=True, config={"displayModeBar": False})
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    # st.markdown('</div>', unsafe_allow_html=True) # REMOVED mwrap
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE : SCORING & TRAFIC
 # ══════════════════════════════════════════════════════════════════════════════
 elif page == "scoring":
-    st.markdown('<div class="mwrap">', unsafe_allow_html=True)
+    # st.markdown('<div class="mwrap">', unsafe_allow_html=True) # REMOVED mwrap
     page_header(
         "Modele Analytique · Calcul Automatique",
         'Scoring & <span class="acc">Trafic Estime</span>',
@@ -2261,14 +2261,14 @@ unsafe_allow_html=True)
         d.columns = ["Site","Secteur","Global","Autorite","Qualite","Technique","Trafic/mois"]
         st.markdown(html_table(d.round(1)), unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    # st.markdown('</div>', unsafe_allow_html=True) # REMOVED mwrap
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE : METADONNEES
 # ══════════════════════════════════════════════════════════════════════════════
 elif page == "meta":
-    st.markdown('<div class="mwrap">', unsafe_allow_html=True)
+    # st.markdown('<div class="mwrap">', unsafe_allow_html=True) # REMOVED mwrap
     page_header(
         "Collecte HTML · Crawl Automatique",
         'Metadonnees <span class="acc">Techniques</span>',
@@ -2359,14 +2359,14 @@ elif page == "meta":
         d["Sitemap"] = d["Sitemap"].apply(lambda x: "Oui" if x == 1 else "Non")
         st.markdown(html_table(d), unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    # st.markdown('</div>', unsafe_allow_html=True) # REMOVED mwrap
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE : PERFORMANCE
 # ══════════════════════════════════════════════════════════════════════════════
 elif page == "perf":
-    st.markdown('<div class="mwrap">', unsafe_allow_html=True)
+    # st.markdown('<div class="mwrap">', unsafe_allow_html=True) # REMOVED mwrap
     page_header(
         "PageSpeed Insights · Google Lighthouse",
         'Performance <span class="acc">Lighthouse</span>',
@@ -2474,14 +2474,14 @@ elif page == "perf":
         cwv.columns = ["Site","Performance","LCP(ms)","FCP(ms)","TTFB(ms)","CLS","Accessibilite"]
         st.markdown(html_table(cwv.round(1)), unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    # st.markdown('</div>', unsafe_allow_html=True) # REMOVED mwrap
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE : BACKLINKS
 # ══════════════════════════════════════════════════════════════════════════════
 elif page == "backlinks":
-    st.markdown('<div class="mwrap">', unsafe_allow_html=True)
+    # st.markdown('<div class="mwrap">', unsafe_allow_html=True) # REMOVED mwrap
     page_header(
         "CommonCrawl Index · Autorite de Domaine",
         'Autorite & <span class="acc">Backlinks</span>',
@@ -2571,14 +2571,14 @@ elif page == "backlinks":
         d["Variation"] = d["Variation"].fillna(0)
         st.markdown(html_table(d), unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    # st.markdown('</div>', unsafe_allow_html=True) # REMOVED mwrap
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE : COMPARAISON
 # ══════════════════════════════════════════════════════════════════════════════
 elif page == "compare":
-    st.markdown('<div class="mwrap">', unsafe_allow_html=True)
+    # st.markdown('<div class="mwrap">', unsafe_allow_html=True) # REMOVED mwrap
     page_header(
         "Analyse Concurrentielle · Multi-Sites",
         'Comparaison <span class="acc">Directe</span>',
@@ -2660,14 +2660,14 @@ elif page == "compare":
                 dt.columns = ["Site","Secteur","Global","Autorite","Qualite","Technique","Trafic/mois"]
                 st.markdown(html_table(dt.round(1).sort_values("Global", ascending=False)), unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    # st.markdown('</div>', unsafe_allow_html=True) # REMOVED mwrap
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE : VEILLE & TENDANCES
 # ══════════════════════════════════════════════════════════════════════════════
 elif page == "veille":
-    st.markdown('<div class="mwrap">', unsafe_allow_html=True)
+    # st.markdown('<div class="mwrap">', unsafe_allow_html=True) # REMOVED mwrap
     page_header(
         "Intelligence Strategique · Simulation · Risques",
         'Veille & <span class="acc">Tendances</span> <span style="font-family:Inter,sans-serif;font-size:.7rem;font-weight:700;background:rgba(201,168,76,0.15);color:#8B6914;border:1px solid rgba(201,168,76,0.3);border-radius:4px;padding:.15rem .5rem;letter-spacing:.08em;vertical-align:middle">BETA</span>',
@@ -2862,7 +2862,7 @@ elif page == "veille":
         rt_tab.columns = ["Site","Secteur","Risque/100","Score Global","Trafic/mois"]
         st.markdown(html_table(rt_tab.round(1)), unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    # st.markdown('</div>', unsafe_allow_html=True) # REMOVED mwrap
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -2871,7 +2871,7 @@ elif page == "veille":
 elif page == "export":
     import base64 as _b64
 
-    st.markdown('<div class="mwrap">', unsafe_allow_html=True)
+    # st.markdown('<div class="mwrap">', unsafe_allow_html=True) # REMOVED mwrap
     page_header(
         "Export · Rapport Executif · Fiche Site",
         'Rapports & <span class="acc">Export</span>',
@@ -3056,25 +3056,23 @@ elif page == "assistant":
         _GROQ_OK = False
 
     # ── Garde-fous AVANT l'ouverture du mwrap ──────────────────────────────────
-    if not _GROQ_OK:
         st.markdown(
-            '<div class="mwrap"><div class="ibox" style="margin-top:2rem">'
+            '<div class="ibox" style="margin-top:2rem">'
             'Module <code>groq</code> manquant — lance : '
-            '<code>pip install groq</code></div></div>',
+            '<code>pip install groq</code></div>',
             unsafe_allow_html=True)
         st.stop()
 
-    _api_key = os.environ.get("GROQ_API_KEY", "")
     if not _api_key:
         st.markdown(
-            '<div class="mwrap"><div class="ibox" style="margin-top:2rem">'
+            '<div class="ibox" style="margin-top:2rem">'
             'Variable <code>GROQ_API_KEY</code> manquante dans <code>.env</code> ou Secrets.'
-            '</div></div>',
+            '</div>',
             unsafe_allow_html=True)
         st.stop()
 
     # ── Ouverture mwrap + header (seulement si on arrive ici) ─────────────────
-    st.markdown('<div class="mwrap">', unsafe_allow_html=True)
+    # st.markdown('<div class="mwrap">', unsafe_allow_html=True) # REMOVED mwrap
     page_header(
         "IA · Analyse · Insights",
         'Assistant <span class="acc">IA</span>',
