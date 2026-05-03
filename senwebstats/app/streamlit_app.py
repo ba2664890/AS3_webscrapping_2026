@@ -21,6 +21,11 @@ try:
 except ImportError:
     pass
 
+# ── LLM Configuration ────────────────────────────────────────────────────────
+_api_key   = os.getenv("LLM_API_KEY", "")
+_api_url   = os.getenv("LLM_BASE_URL", "https://router.huggingface.co/v1")
+_api_model = os.getenv("LLM_MODEL", "meta-llama/Meta-Llama-3-8B-Instruct")
+
 try:
     from models.ctr_model import compute_ctr_scores, SerperDevClient, CATEGORY_BASE, CATEGORY_LABELS
     _CTR_OK = True
@@ -3066,7 +3071,7 @@ elif page == "assistant":
     if not _api_key:
         st.markdown(
             '<div class="ibox" style="margin-top:2rem">'
-            'Variable <code>GROQ_API_KEY</code> manquante dans <code>.env</code> ou Secrets.'
+            'Variable <code>LLM_API_KEY</code> manquante dans <code>.env</code> ou Secrets.'
             '</div>',
             unsafe_allow_html=True)
         st.stop()
@@ -3125,14 +3130,19 @@ elif page == "assistant":
     # ── Vérification clé API ────────────────────────────────────────────────────
     @st.cache_data(ttl=120)
     def _check_api(key: str) -> tuple[bool, str]:
+        if not key: return False, "Clé API manquante"
         try:
-            c = _Groq(api_key=key)
-            c.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                max_tokens=5,
-                messages=[{"role": "user", "content": "ok"}]
-            )
-            return True, ""
+            import requests as _req
+            headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+            payload = {
+                "model": _api_model,
+                "messages": [{"role": "user", "content": "ping"}],
+                "max_tokens": 10
+            }
+            res = _req.post(f"{_api_url}/chat/completions", headers=headers, json=payload, timeout=10)
+            if res.status_code == 200:
+                return True, ""
+            return False, f"HTTP {res.status_code}: {res.text[:100]}"
         except Exception as e:
             return False, str(e)
 
@@ -3140,8 +3150,8 @@ elif page == "assistant":
 
     if not _api_ok:
         st.warning(
-            f"**Erreur API Groq** : {_api_err}  \n"
-            "Vérifie ta clé sur **console.groq.com**  \n\n"
+            f"**Erreur API Hugging Face** : {_api_err}  \n"
+            "Vérifiez votre token et l'URL du routeur.  \n\n"
             "Le mode analyse hors-ligne reste disponible ci-dessous.",
             icon=None
         )
@@ -3374,21 +3384,32 @@ Données du contexte ci-dessous (mises à jour en temps réel depuis la base) :
     def _generate_answer(question: str) -> str:
         if _api_ok:
             try:
+                import requests as _req
                 ctx = _build_context()
-                client = _Groq(api_key=_api_key)
-                response = client.chat.completions.create(
-                    model="llama-3.3-70b-versatile",
-                    max_tokens=1024,
-                    messages=[
-                        {"role": "system", "content": SYSTEM_PROMPT + "\n\n" + ctx},
-                    ] + [
-                        {"role": m["role"], "content": m["content"]}
-                        for m in st.session_state.chat_messages
-                    ],
-                )
-                return response.choices[0].message.content
+                headers = {"Authorization": f"Bearer {_api_key}", "Content-Type": "application/json"}
+                
+                messages = [
+                    {"role": "system", "content": SYSTEM_PROMPT + "\n\n" + ctx},
+                ] + [
+                    {"role": m["role"], "content": m["content"]}
+                    for m in st.session_state.chat_messages
+                ]
+                
+                payload = {
+                    "model": _api_model,
+                    "messages": messages,
+                    "max_tokens": 1024,
+                    "temperature": 0.7
+                }
+                
+                res = _req.post(f"{_api_url}/chat/completions", headers=headers, json=payload, timeout=60)
+                if res.status_code == 200:
+                    return res.json()["choices"][0]["message"]["content"]
+                
+                return (f"⚠️ Erreur API Hugging Face (HTTP {res.status_code}) : {res.text[:200]}\n\n---\n\n**Mode analyse :**\n\n"
+                        + _analyse_hors_ligne(question))
             except Exception as e:
-                return (f"⚠️ Erreur API Groq : {e}\n\n---\n\n**Mode analyse :**\n\n"
+                return (f"⚠️ Erreur technique : {e}\n\n---\n\n**Mode analyse :**\n\n"
                         + _analyse_hors_ligne(question))
         return _analyse_hors_ligne(question)
 
