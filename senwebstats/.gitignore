@@ -12,7 +12,7 @@ dist/
 build/
 
 # Données locales
-data/*.db
+# data/*.db
 data/*.csv
 
 # IDE

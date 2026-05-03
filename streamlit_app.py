@@ -447,7 +447,7 @@ button[data-baseweb="tab"][aria-selected="true"] {
 """, unsafe_allow_html=True)
 
 # ── DB ────────────────────────────────────────────────────────────────────────
-DB_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "senwebstats.db")
+DB_PATH = os.path.join(os.path.dirname(__file__), "senwebstats", "data", "senwebstats.db")
 
 @st.cache_resource
 def get_conn():
